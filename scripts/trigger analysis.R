@@ -319,7 +319,7 @@ fishzonemap<-leaflet(data = egdaily) %>%
     addCircleMarkers(lng = ~egdaily$lon, lat = ~egdaily$lat, radius = 5, fillOpacity = 1, weight = 2, color = ~leafpal(egdaily$number), popup = paste0(egdaily$time,", Group Size:", egdaily$number))%>%
     addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
     addLegend(pal = leafpal, values = egdaily$number, opacity = 0.9, position = "topleft")%>%
-    addLegend(colors = c("orange","green","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")%>%
+    addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")%>%
     fitBounds(min(egdaily$lon),min(egdaily$lat),max(egdaily$lon),max(egdaily$lat))
   
 output$fishzonemap<-renderLeaflet({fishzonemap})
