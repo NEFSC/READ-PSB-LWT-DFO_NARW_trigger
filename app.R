@@ -1,7 +1,7 @@
-##########################################
-## App file for NARWSS & RWSAS DMA APPs ##
-## Leah Crowe 2019                      ##
-##########################################
+#############################################
+## App file for DFO dynamic management APP ##
+## Leah Crowe 2019                         ##
+#############################################
 
 
 #############
@@ -15,32 +15,19 @@ source('./scripts/global_libraries.R', local = TRUE)$value
 ####################
 
 ui <- dashboardPage(
-  dashboardHeader(title = "NERW Shiny"),
+  dashboardHeader(title = "DFO Shiny"),
   ## Sidebar content
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Aerial Survey Processing App", tabName = "NARWSS"),
-      menuItem("RWSAS DMA Evaluation", tabName = "RWSAS"),
-      menuItem("Photo Position Finder", tabName = "Photo")
+      menuItem("Dynamic Management", tabName = "DynMan")
     )
   ),
   ## Body content
-  dashboardBody(tagList(img(src = 'noaanefsclogo.PNG'),br()),
-                tags$head(tags$link(rel = "icon", type = "image/png", href = "favicon.png")),
+  dashboardBody(
     tabItems(
       # First tab content
-      tabItem(tabName = "NARWSS",
-              source('./scripts/NARWSSapp.R', local = TRUE)$value
-      ),
-      
-      # Second tab content
-      tabItem(tabName = "RWSAS",
-              source('./scripts/DMAapp.R', local = TRUE)$value
-      ),
-      
-      # Third tab content
-      tabItem(tabName = "Photo",
-              source('./scripts/photo_app.R', local = TRUE)$value
+      tabItem(tabName = "DynMan",
+              source('./scripts/DFO_app.R', local = TRUE)$value
       )
     )
   )
@@ -49,8 +36,6 @@ ui <- dashboardPage(
 server = function(input, output, session) {
   
 
-  #source('./scripts/NARWSSserver.R', local = TRUE)$value
-  #source('./scripts/DMAserver.R', local = TRUE)$value
 }
 
 shinyApp(ui, server)
