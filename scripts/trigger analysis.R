@@ -305,20 +305,28 @@ if (nrow(fishzonesig) > 0){
   
   centroid<-gCentroid(polyclust_sp,byid=TRUE)
 
+  leafpal <- colorFactor(palette = rev("RdPu"), 
+                         domain = egdaily$number)
+  
   
 fishzonemap<-leaflet(data = egdaily) %>% 
-    addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=TRUE) %>%
+    addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
     addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
     addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
+    addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSLgrid$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center")) %>%
     addPolygons(data = polyclust_sp, weight = 2, color = "blue") %>%
-    addPolygons(data = polycoorddf_sp, weight = 2, color = "black")%>%
-    addCircleMarkers(lng = ~egdaily$lon, lat = ~egdaily$lat, radius = 5, stroke = FALSE, fillOpacity = 0.5 , color = "black", popup = paste0(egdaily$time,", Group Size:", egdaily$number))%>%
+    addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
+    addCircleMarkers(lng = ~egdaily$lon, lat = ~egdaily$lat, radius = 5, fillOpacity = 1, weight = 2, color = ~leafpal(egdaily$number), popup = paste0(egdaily$time,", Group Size:", egdaily$number))%>%
     addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
-    addLegend(colors = c("orange","green"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid"), opacity = 0.3, position = "topleft")  
+    addLegend(pal = leafpal, values = egdaily$number, opacity = 0.9, position = "topleft")%>%
+    addLegend(colors = c("orange","green","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")%>%
+    fitBounds(min(egdaily$lon),min(egdaily$lat),max(egdaily$lon),max(egdaily$lat))
   
 output$fishzonemap<-renderLeaflet({fishzonemap})
 
 }
+
+?labelOptions
   
 
 
