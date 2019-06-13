@@ -15,7 +15,7 @@ output$finalmess <- renderText({
     egdaily<-read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
     print(egdaily)
     output$finalmess<-renderText({"Great job"})
-    smapath<-"./SMA ind shp"
+    shapepath<-"./shapefiles"
     
     source('./scripts/shapefiles.R', local = TRUE)$value
     source('./scripts/trigger analysis.R', local = TRUE)$value
