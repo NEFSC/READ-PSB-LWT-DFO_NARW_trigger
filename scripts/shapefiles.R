@@ -10,23 +10,25 @@
   CRS.latlon<-CRS("+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs +towgs84=0,0,0")
   
 ######
-dyna_ship<-readOGR(smapath, layer = "Dynamic_Shipping_Section")
-crab_grid<-readOGR(smapath, layer = "Snow_Crab_Grids")
-stat_fish<-readOGR(smapath, layer = "Static_Fishing_Closure")
-full_grid<-readOGR(smapath, layer = "Full_Gulf_Grids")
+crab_grid<-readOGR(shapepath, layer = "Snow_Crab_Grids")
+dyna_ship<-readOGR(shapepath, layer = "Dynamic_Shipping_Section")
+#stat_fish<-readOGR(shapepath, layer = "Static_Fishing_Closure")
+GSL_grid<-readOGR(shapepath, layer = "cropped_full_grid")
 ##france
-spm<-readOGR(smapath, layer = "spm")
+#spm<-readOGR(shapepath, layer = "spm")
 
 ## projected properly
 ##dynamic fishing grid
 crab_grid.tr<-spTransform(crab_grid, CRS.new)
 ##dynamic shipping
 dyna_ship.tr<-spTransform(dyna_ship, CRS.new)
+##full fishing grid
+GSL_grid.tr<-spTransform(GSL_grid, CRS.new)
 #st. pierre et micquelon
-spm<-spTransform(spm, CRS.new)
+#spm<-spTransform(spm, CRS.new)
 
 ######  
-
-dyna_ship.sp<-spTransform(dyna_ship.tr,CRS.latlon)
 crab_grid.sp<-spTransform(crab_grid.tr,CRS.latlon)
+dyna_ship.sp<-spTransform(dyna_ship.tr,CRS.latlon)
+GSL_grid.sp<-spTransform(GSL_grid.tr,CRS.latlon)
 
