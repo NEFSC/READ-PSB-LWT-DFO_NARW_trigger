@@ -4,6 +4,7 @@
 
 egdaily$number<-as.numeric(egdaily$number)
 egdaily$time<-mdy_hm(egdaily$time)
+sigdate<-unique(date(egdaily$time))
 ##copy for spatializing
 eg<-egdaily
 print(eg)
@@ -23,18 +24,18 @@ dynfish<-!is.na(sp::over(eg.tr, as(crab_grid.tr, "SpatialPolygons")))
 ##evaluate sightings over the dynamic shipping grid
 dynship<-!is.na(sp::over(eg.tr, as(dyna_ship.tr, "SpatialPolygons")))
 ##evaluate sightings if in st. pierre et micquelon
-SPM<-!is.na(sp::over(eg.tr, as(spm, "SpatialPolygons")))
+#SPM<-!is.na(sp::over(eg.tr, as(spm, "SpatialPolygons")))
 
-sightID<-1:nrow(egeval)
-egeval<-cbind(egdaily,dynfish,dynship,SPM,sightID)
-print(egeval)
+sightID<-1:nrow(egdaily)
+egdaily<-cbind(egdaily,dynfish,dynship,sightID) #add SPM here if you decide to include
+print(egdaily)
 
 ############
 ##filter for eg sightings that should be evaluated for dynamic fishing closures
-egfishtrig<-egeval%>%
+egfishtrig<-egdaily%>%
   filter(dynfish == FALSE)
 ##filter for eg sightings that should be evaluated for dynamic shipping speed zones
-egshiptrip<-egeval%>%
+egshiptrip<-egdaily%>%
   filter(dynship == FALSE)
 ##add something here that asks if sightings are in France
 
@@ -54,7 +55,7 @@ egden<-0.0416
 #########################################
 
 ##fishing
-if (FALSE %in% egeval$dynfish) {
+if (FALSE %in% egdaily$dynfish) {
   ##only taking ACTION_NEW = na
   actionna<-egfishtrig %>% dplyr::select("time", "lat", "lon", "number","sightID")
   ##distance between points matrix -- compares right whale sightings positions to each other
@@ -83,7 +84,7 @@ if (FALSE %in% egeval$dynfish) {
   
   ##the below filters for sightings that are good for zone calc (are in the dmasightID list)
 
-  fishzonesig<-egeval%>%
+  fishzonesig<-egdaily%>%
     right_join(dmasightID, by = "sightID")
   
   print(fishzonesig)
@@ -93,6 +94,7 @@ if (FALSE %in% egeval$dynfish) {
 ################
 ##Create Zone ##
 ################
+incProgress(1/5) #for progress bar
 
 if (nrow(fishzonesig) > 0){
   ##############################
@@ -221,6 +223,7 @@ if (nrow(fishzonesig) > 0){
     } else { 
     }
   
+  incProgress(1/5) #for progress bar
   
   #########
   clustdf$PolyID<-as.numeric(clustdf$PolyID)
@@ -282,7 +285,7 @@ if (nrow(fishzonesig) > 0){
   
   corebounds<-rbind(corebounds_nw,corebounds_sw,corebounds_se,corebounds_ne,corebounds_nw)
   
-
+  incProgress(1/5) #for progress bar
   #make the bounds a polygon
   IDclust<-split(corebounds, corebounds$cluster)
   
@@ -308,25 +311,79 @@ if (nrow(fishzonesig) > 0){
   leafpal <- colorFactor(palette = rev("RdPu"), 
                          domain = egdaily$number)
   
+  if(max(egfishtrig$lon)-min(egfishtrig$lon) < 0.2 | max(egfishtrig$lat)-min(egfishtrig$lat) < 0.2){
+    minlon<-min(egfishtrig$lon)+0.1
+    minlat<-min(egfishtrig$lat)-0.1
+    maxlon<-max(egfishtrig$lon)-0.1
+    maxlat<-max(egfishtrig$lat)+0.1
+  } else {
+    minlon<-min(egfishtrig$lon)
+    minlat<-min(egfishtrig$lat)
+    maxlon<-max(egfishtrig$lon)
+    maxlat<-max(egfishtrig$lat)
+  }
   
-fishzonemap<-leaflet(data = egdaily) %>% 
+  mapbase<-leaflet(data = egfishtrig, options = leafletOptions(zoomControl = FALSE)) %>% 
     addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
     addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
     addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
-    addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSLgrid$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center")) %>%
-    addPolygons(data = polyclust_sp, weight = 2, color = "blue") %>%
-    addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
-    addCircleMarkers(lng = ~egdaily$lon, lat = ~egdaily$lat, radius = 5, fillOpacity = 1, weight = 2, color = ~leafpal(egdaily$number), popup = paste0(egdaily$time,", Group Size:", egdaily$number))%>%
-    addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
-    addLegend(pal = leafpal, values = egdaily$number, opacity = 0.9, position = "topleft")%>%
-    addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")%>%
-    fitBounds(min(egdaily$lon),min(egdaily$lat),max(egdaily$lon),max(egdaily$lat))
+    addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center")) %>%
+    fitBounds(minlon,minlat,maxlon,maxlat)
   
-output$fishzonemap<-renderLeaflet({fishzonemap})
+ map1<-mapbase%>%
+   addCircleMarkers(lng = ~egfishtrig$lon, lat = ~egfishtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egfishtrig$number), popup = paste0(egfishtrig$time,", Group Size:", egfishtrig$number))%>%
+   addLegend(pal = leafpal, values = egfishtrig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
+   addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
 
+ map2<-mapbase%>%
+   addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
+   addCircleMarkers(lng = ~egfishtrig$lon, lat = ~egfishtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egfishtrig$number), popup = paste0(egfishtrig$time,", Group Size:", egfishtrig$number))%>%
+   addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
+
+ map3<-mapbase%>%    
+   addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
+   addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
+   addLegend(colors = c("green","orange","grey","blue"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid","Core Area"), opacity = 0.3, position = "topleft")
+ 
+ map4<-mapbase%>%
+   addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
+   addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
+   addLegend(colors = c("red"), labels = "Calculated Center of Core Area", opacity = 0.9, position = "topleft")%>%
+   addLegend(colors = c("green","orange","grey","blue"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid","Core Area"), opacity = 0.3, position = "topleft")
+
+ 
+ webshotpath<-paste0(getwd(),"/",sigdate,"_map")
+ print(webshotpath)
+ 
+ snap<-function(x,y){
+ 
+ htmlwidgets::saveWidget(x, "temp.html", selfcontained = FALSE)
+ webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"))
+ 
+ }
+  
+snap(map1,1) 
+snap(map2,2) 
+snap(map3,3) 
+snap(map4,4) 
+
+incProgress(1/5) #for progress bar
+
+output$map1<-renderLeaflet({map1})
+output$map2<-renderLeaflet({map2})
+output$map3<-renderLeaflet({map3})
+output$map4<-renderLeaflet({map4})
+
+enable("mappdf")
+
+filename = paste0(sigdate,"_Trigger_Analysis.pdf")
+tempReport<-file.path("./scripts/TrigAnalysisPDF.Rmd")
+
+file.copy("TrigAnalysisPDF.Rmd", tempReport, overwrite = FALSE)
+params<-list(sigdate = sigdate, webshotpath = webshotpath)
+
+rmarkdown::render(tempReport, output_file = filename,
+                  params = params,
+                  envir = new.env(parent = globalenv())
+                  )
 }
-
-?labelOptions
-  
-
-
