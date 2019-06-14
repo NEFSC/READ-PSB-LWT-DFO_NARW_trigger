@@ -7,23 +7,22 @@ fluidPage(
                 accept = c(
                   "text/csv",
                   "text/comma-separated-values,text/plain",
-                  ".csv")
-      )
-    ),
+                  ".csv")),
+      downloadButton("mappdf", "Download PDF")),
     mainPanel(
       (HTML(paste('<br/>',
                   "CSV must include these columns:",'<br/>',
                   '<br/>',
-                  "Field EGNO, EG Letter, Local Time, Day, Month, Year, Latitude, Longitude, Area, Obs, Platform, Image Type, Assoc. Type, Behaviors, Notes, Photographer, Frames, First Edit, Second Edit, Final Edit",
-                  '<br/>','<br/>',
-                  'Latitude, Longitude, Area, Obs, Platform, and Image Type <strong>can be blank</strong>.',
-                  '<br/>','<br/>',
-                  "Local Time and EG Letter should <strong>not be blank</strong>.",
-                  '<br/>','<br/>'))),
-      br(),
+                  "time, lat, lon, date, yday, species, score, number, calves, year, platform, name, id"
+                  ))),
+      br(),#space
       textOutput("finalmess"),
       br(),
-      leafletOutput("fishzonemap")
+      splitLayout(leafletOutput("map1"),leafletOutput("map2"),
+                  width = 2),
+      br(),
+      splitLayout(leafletOutput("map3"),leafletOutput("map4"),
+                  width = 2)
     )
     )
     )
