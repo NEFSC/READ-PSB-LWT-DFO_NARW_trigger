@@ -7,8 +7,8 @@ fluidPage(
                 accept = c(
                   "text/csv",
                   "text/comma-separated-values,text/plain",
-                  ".csv")),
-      downloadButton("mappdf", "Download PDF")),
+                  ".csv"))
+      ),
     mainPanel(
       (HTML(paste('<br/>',
                   "CSV must include these columns:",'<br/>',
@@ -19,10 +19,10 @@ fluidPage(
       textOutput("finalmess"),
       br(),
       splitLayout(leafletOutput("map1"),leafletOutput("map2"),
-                  width = 2),
+      width = 2),
       br(),
       splitLayout(leafletOutput("map3"),leafletOutput("map4"),
-                  width = 2)
+      width = 2)
     )
     )
     )
