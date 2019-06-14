@@ -7,7 +7,8 @@ fluidPage(
                 accept = c(
                   "text/csv",
                   "text/comma-separated-values,text/plain",
-                  ".csv"))
+                  ".csv")),
+      downloadHandler("mappdf","Download")
       ),
     mainPanel(
       (HTML(paste('<br/>',
@@ -16,7 +17,7 @@ fluidPage(
                   "time, lat, lon, date, yday, species, score, number, calves, year, platform, name, id"
                   ))),
       br(),#space
-      textOutput("finalmess"),
+      #uiOutput("finalmess"),
       br(),
       splitLayout(leafletOutput("map1"),leafletOutput("map2"),
       width = 2),
