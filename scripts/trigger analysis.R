@@ -308,8 +308,14 @@ if (nrow(fishzonesig) > 0){
   
   centroid<-gCentroid(polyclust_sp,byid=TRUE)
 
+  egfishtrig<-egfishtrig%>%
+    mutate(corer=round(sqrt(number/(pi*egden)),2))
+  
   leafpal <- colorFactor(palette = rev("RdPu"), 
-                         domain = egdaily$number)
+                         domain = egfishtrig$number)
+  
+  leafpal2 <- colorFactor(palette = rev("RdPu"), 
+                         domain = egfishtrig$corer)
   
   if(max(egfishtrig$lon)-min(egfishtrig$lon) < 0.2 | max(egfishtrig$lat)-min(egfishtrig$lat) < 0.2){
     minlon<-min(egfishtrig$lon)+0.1
@@ -338,6 +344,7 @@ if (nrow(fishzonesig) > 0){
  map2<-mapbase%>%
    addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
    addCircleMarkers(lng = ~egfishtrig$lon, lat = ~egfishtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egfishtrig$number), popup = paste0(egfishtrig$time,", Group Size:", egfishtrig$number))%>%
+   addLegend(pal = leafpal2, values = egfishtrig$corer, opacity = 0.9, position = "topleft", title = "Whale Density Radius (nm)")%>%
    addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
 
  map3<-mapbase%>%    
@@ -358,14 +365,18 @@ if (nrow(fishzonesig) > 0){
  snap<-function(x,y){
  
  htmlwidgets::saveWidget(x, "temp.html", selfcontained = FALSE)
- webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"))
+ webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"), vwidth = 600, vheight = 450)
  
  }
-  
-snap(map1,1) 
-snap(map2,2) 
-snap(map3,3) 
+ 
+snap(map1,1)
+print("map 1")  
+snap(map2,2)
+print("map 2") 
+snap(map3,3)
+print("map 3") 
 snap(map4,4) 
+print("map 4") 
 
 incProgress(1/5) #for progress bar
 
@@ -373,8 +384,6 @@ output$map1<-renderLeaflet({map1})
 output$map2<-renderLeaflet({map2})
 output$map3<-renderLeaflet({map3})
 output$map4<-renderLeaflet({map4})
-
-enable("mappdf")
 
 filename = paste0(sigdate,"_Trigger_Analysis.pdf")
 tempReport<-file.path("./scripts/TrigAnalysisPDF.Rmd")
@@ -386,4 +395,5 @@ rmarkdown::render(tempReport, output_file = filename,
                   params = params,
                   envir = new.env(parent = globalenv())
                   )
+
 }
