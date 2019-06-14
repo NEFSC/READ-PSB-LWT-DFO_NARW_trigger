@@ -385,15 +385,6 @@ output$map2<-renderLeaflet({map2})
 output$map3<-renderLeaflet({map3})
 output$map4<-renderLeaflet({map4})
 
-filename = paste0(sigdate,"_Trigger_Analysis.pdf")
-tempReport<-file.path("./scripts/TrigAnalysisPDF.Rmd")
-
-file.copy("TrigAnalysisPDF.Rmd", tempReport, overwrite = FALSE)
-params<-list(sigdate = sigdate, webshotpath = webshotpath)
-
-rmarkdown::render(tempReport, output_file = filename,
-                  params = params,
-                  envir = new.env(parent = globalenv())
-                  )
-
 }
+
+
