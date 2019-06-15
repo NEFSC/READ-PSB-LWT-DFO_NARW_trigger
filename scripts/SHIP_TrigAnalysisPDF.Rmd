@@ -3,6 +3,7 @@ title:  "`r paste('North Atlantic Right Whale Sightings Outside Dynamic Shipping
 params:
   sigdate: NA
   webshotpath: NA
+  bounds: NA
 geometry: margin=1cm
 output: pdf_document
 classoption: landscape
@@ -13,6 +14,8 @@ knitr::include_graphics(c(paste0(params$webshotpath,"1.png"),paste0(params$websh
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis', out.width = '45%', fig.align="center", fig.show='hold'}
 knitr::include_graphics(c(paste0(params$webshotpath,"3.png"),paste0(params$webshotpath,"4.png")))
-
+```
+```{r echo = FALSE, warning = FALSE, results = 'asis'}
+knitr::kable(params$bounds, caption = "Core Area Bounds")
 ```
 
