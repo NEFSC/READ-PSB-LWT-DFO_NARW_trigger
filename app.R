@@ -19,14 +19,14 @@ ui <- dashboardPage(
   ## Sidebar content
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Trigger Analysis", tabName = "Trig")
+      menuItem("Fishing Trigger Analysis", tabName = "FishTrig")
     )
   ),
   ## Body content
   dashboardBody(
     tabItems(
       # First tab content
-      tabItem(tabName = "Trig",
+      tabItem(tabName = "FishTrig",
               source('./scripts/DFO_app.R', local = TRUE)$value
       )
     )
