@@ -1,1 +1,40 @@
-# DFO_dyna
+# DFO Right Whale Sightings Trigger Analysis
+
+Required packages include:
+
+```
+library(shiny)
+library(shinyjs)
+library(shinydashboard)
+library(dplyr)
+library(ggplot2)
+library(rgeos)
+library(rgdal)
+library(sp)
+library(raster)
+library(scales)
+library(extrafont)
+library(fontcm)
+library(leaflet)
+library(leaflet.esri)
+library(knitr)
+library(lubridate)
+library(data.table)
+library(zoo)
+library(rhandsontable)
+library(RColorBrewer)
+library(reshape)
+library(geosphere)
+library(maptools)
+library(maps)
+library(rmarkdown)
+library(RODBC)
+library(DBI)
+library(sqldf)
+library(tinytex)
+library(igraph)
+library(htmlwidgets)
+library(webshot)
+library(rlist)
+
+```
