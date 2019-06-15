@@ -1,5 +1,5 @@
 ---
-title:  "`r paste('North Atlantic Right Whale Sightings Outside Dynamic Zones', params$sigdate)`"
+title:  "`r paste('North Atlantic Right Whale Sightings Outside Dynamic Fishing Zones', params$sigdate)`"
 params:
   sigdate: NA
   webshotpath: NA
