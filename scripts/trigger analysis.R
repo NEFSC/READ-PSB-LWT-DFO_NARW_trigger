@@ -311,7 +311,6 @@ if (nrow(zonesig) > 0){
     dplyr::select(id,order,LAT,LON)%>%
     dplyr::rename("ID" = "id", "VERTEX" = "order")
   
-  
   centroid<-gCentroid(polyclust_sp,byid=TRUE)
 
   egtrig<-egtrig%>%
