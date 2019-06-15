@@ -8,7 +8,9 @@ fluidPage(
                   "text/csv",
                   "text/comma-separated-values,text/plain",
                   ".csv")),
-      downloadButton("mappdf","Download")
+      downloadButton("mappdf","Download"),
+      br(),#space
+      tableOutput("corebounds")
       ),
     mainPanel(
       (HTML(paste('<br/>',
@@ -23,7 +25,8 @@ fluidPage(
       width = 2),
       br(),
       splitLayout(leafletOutput("map3"),leafletOutput("map4"),
-      width = 2)
+      width = 2),
+      br()
     )
     )
     )
