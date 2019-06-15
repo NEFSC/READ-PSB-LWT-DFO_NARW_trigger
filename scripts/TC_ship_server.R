@@ -33,6 +33,10 @@ observe({
     source('./scripts/trigger analysis.R', local = TRUE)$value
     enable("mappdf")
     
+    ##table for core area boundaries
+    values$bounds<-bounds%>%
+      filter(VERTEX != 5)
+    output$corebounds<-renderTable({values$bounds},  striped = TRUE)
     })
   }
 
@@ -47,7 +51,7 @@ observe({
         file.copy("SHIP_TrigAnalysisPDF.Rmd", tempReport, overwrite = FALSE)
         print("button pressed")
         
-        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath)
+        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath, bounds = values$bounds)
         
         rmarkdown::render(tempReport, output_file = file,
                           params = params,
