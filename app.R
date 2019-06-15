@@ -15,20 +15,23 @@ source('./scripts/global_libraries.R', local = TRUE)$value
 ####################
 
 ui <- dashboardPage(
-  dashboardHeader(title = "DFO Shiny"),
+  dashboardHeader(title = "DFO/TC Shiny"),
   ## Sidebar content
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Fishing Trigger Analysis", tabName = "FishTrig")
+      menuItem("Fishing Trigger Analysis", tabName = "FishTab"),
+      menuItem("Shipping Trigger Analysis", tabName = "ShipTab")
     )
   ),
   ## Body content
   dashboardBody(
     tabItems(
       # First tab content
-      tabItem(tabName = "FishTrig",
-              source('./scripts/DFO_app.R', local = TRUE)$value
-      )
+      tabItem(tabName = "FishTab",
+              source('./scripts/DFO_fish.R', local = TRUE)$value),
+      ## Second tab content
+      tabItem(tabName = "ShipTab",
+              source('./scripts/TC_ship.R', local = TRUE)$value)
     )
   )
 )
