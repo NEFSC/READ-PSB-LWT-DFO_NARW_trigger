@@ -1,6 +1,6 @@
 fluidPage(
   useShinyjs(),
-  titlePanel("DFO Trigger Analysis"),
+  titlePanel("DFO Trigger Analysis - Potential Fishing Closures"),
   sidebarLayout(
     sidebarPanel(
       fileInput("egcanada", "Choose CSV File",
@@ -8,7 +8,7 @@ fluidPage(
                   "text/csv",
                   "text/comma-separated-values,text/plain",
                   ".csv")),
-      downloadHandler("mappdf","Download")
+      downloadButton("mappdf","Download")
       ),
     mainPanel(
       (HTML(paste('<br/>',
