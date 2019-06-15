@@ -1,24 +1,28 @@
 disable("mappdf")
+values <- reactiveValues()
 df <- reactive({
-  # input$file1 will be NULL initially. After the user selects
+  # input$file will be NULL initially. After the user selects
   # and uploads a file, it will be a data frame with 'name',
   # 'size', 'type', and 'datapath' columns. The 'datapath'
   # column will contain the local filenames where the data can
   # be found.
   
   inFile <- input$egcanada
-  
+
   if (is.null(inFile)){
     return("")
-    print("no pathway")
   }else{
-    read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)}
+    x<-read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
+    x$time<-mdy_hm(x$time)
+    values$sigdate<-unique(date(x$time))
+    values$webshotpath<-paste0(getwd(),"/",values$sigdate,"_map")
+    
+    read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
+    }
   })
-
-
-obslist<-observe({
+##observe looks at reactive but does not produce anything
+observe({
   egdaily<-df()
-  print(egdaily)
   if(egdaily != ""){
     withProgress(message = 'Analyzing sightings for new protection zones...', value = 0, {
     shapepath<-"./shapefiles"
@@ -27,22 +31,29 @@ obslist<-observe({
     incProgress(1/5)
     source('./scripts/trigger analysis.R', local = TRUE)$value
     enable("mappdf")
-    })
     
+    })
+  }
+
+})
     output$mappdf<-downloadHandler(
       
-      filename = paste0(sigdate,"_Trigger_Analysis.pdf"),
+      filename = function() {
+        paste0(values$sigdate,"_Trigger_Analysis.pdf")},
       content = function(file) {
         tempReport<-file.path("./scripts/TrigAnalysisPDF.Rmd")
-        print("button pressed")
+        
         file.copy("TrigAnalysisPDF.Rmd", tempReport, overwrite = FALSE)
-        params<-list(sigdate = sigdate, webshotpath = webshotpath)
+        print("button pressed")
+        
+        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath)
         
         rmarkdown::render(tempReport, output_file = file,
                           params = params,
                           envir = new.env(parent = globalenv())
-        )})
+        )
+        })
     
-    }
-})
+
+
 
