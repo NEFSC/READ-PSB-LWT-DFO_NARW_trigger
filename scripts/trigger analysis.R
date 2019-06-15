@@ -3,11 +3,15 @@
 ######################
 
 egdaily$number<-as.numeric(egdaily$number)
+
 egdaily$time<-mdy_hm(egdaily$time)
 sigdate<-unique(date(egdaily$time))
+
+sightID<-1:nrow(egdaily)
+egdaily<-cbind(egdaily,sightID) #add SPM here if you decide to include
+
 ##copy for spatializing
 eg<-egdaily
-print(eg)
 ##declare which columns are coordinates
 coordinates(eg)<-~lon+lat
 ##declare what kind of projection thy are in
@@ -15,28 +19,31 @@ proj4string(eg)<-CRS.latlon
 ##change projection
 eg.tr<-spTransform(eg, CRS.new)
 
-#####################
-## Dynamic Fishing ##
-#####################
+###################################
+## Evaluating Over Dynamic Zones ##
+###################################
 
-##evaluate sightings over the dynamic fishing grid
-dynfish<-!is.na(sp::over(eg.tr, as(crab_grid.tr, "SpatialPolygons")))
-##evaluate sightings over the dynamic shipping grid
-dynship<-!is.na(sp::over(eg.tr, as(dyna_ship.tr, "SpatialPolygons")))
 ##evaluate sightings if in st. pierre et micquelon
 #SPM<-!is.na(sp::over(eg.tr, as(spm, "SpatialPolygons")))
 
-sightID<-1:nrow(egdaily)
-egdaily<-cbind(egdaily,dynfish,dynship,sightID) #add SPM here if you decide to include
-print(egdaily)
-
 ############
-##filter for eg sightings that should be evaluated for dynamic fishing closures
-egfishtrig<-egdaily%>%
-  filter(dynfish == FALSE)
-##filter for eg sightings that should be evaluated for dynamic shipping speed zones
-egshiptrip<-egdaily%>%
-  filter(dynship == FALSE)
+if(FS == 'FISH'){
+  ##evaluate sightings over the dynamic fishing grid
+  dynfish<-!is.na(sp::over(eg.tr, as(crab_grid.tr, "SpatialPolygons")))
+  ##filter for eg sightings that should be evaluated for dynamic fishing closures
+  egtrig<-egdaily%>%
+    mutate(dyneval = dynfish)%>%
+    filter(dyneval == FALSE)
+} else if (FS == 'SHIP'){
+  ##evaluate sightings over the dynamic shipping grid
+  dynship<-!is.na(sp::over(eg.tr, as(dyna_ship.tr, "SpatialPolygons")))
+  ##filter for eg sightings that should be evaluated for dynamic shipping speed zones
+  egtrig<-egdaily%>%
+    mutate(dyneval = dynship)%>%
+    filter(dyneval == FALSE)
+    
+}
+############
 ##add something here that asks if sightings are in France
 
 ######################
@@ -54,10 +61,9 @@ egden<-0.0416
 ## animals potential for zone triggers ##
 #########################################
 
-##fishing
-if (FALSE %in% egdaily$dynfish) {
+if (FALSE %in% egtrig$dyneval) {
   ##only taking ACTION_NEW = na
-  actionna<-egfishtrig %>% dplyr::select("time", "lat", "lon", "number","sightID")
+  actionna<-egtrig %>% dplyr::select("time", "lat", "lon", "number","sightID")
   ##distance between points matrix -- compares right whale sightings positions to each other
   combo<-reshape::expand.grid.df(actionna,actionna)
   names(combo)[6:10]<-c("time2","lat2","lon2","number2","sightID2")
@@ -71,8 +77,8 @@ if (FALSE %in% egdaily$dynfish) {
   print(combo)
   combo%>%as.data.frame()%>%
     filter(sightID == 28)
-  #filters out points compared where core radius is less than the distance between them (meaning that the position combo will not have overlapping core radii) and
-  #keeps the single sightings where group size would be enough to trigger a DMA (0 nm dist means it is compared to itself)
+  #filters out points compared where core radius is less than the distance between them and
+  #keeps the single sightings where group size alone would be enough to trigger a DMA (0 nm dist means it is compared to itself)
   #I don't remember why I named this dmacand -- maybe dma combo and... then some?
   dmacand<-combo %>%
     dplyr::filter((combo$dist_nm != 0 & combo$dist_nm <= combo$corer) | (combo$number > 2 & combo$dist_nm == 0))
@@ -84,10 +90,10 @@ if (FALSE %in% egdaily$dynfish) {
   
   ##the below filters for sightings that are good for zone calc (are in the dmasightID list)
 
-  fishzonesig<-egdaily%>%
+  zonesig<-egdaily%>%
     right_join(dmasightID, by = "sightID")
   
-  print(fishzonesig)
+  print(zonesig)
   ##############
 }
 
@@ -96,12 +102,12 @@ if (FALSE %in% egdaily$dynfish) {
 ################
 incProgress(1/5) #for progress bar
 
-if (nrow(fishzonesig) > 0){
+if (nrow(zonesig) > 0){
   ##############################
-  ##CREATING A management zone##
+  ##CREATING a management zone##
   ##############################
 
-  dmasights<-fishzonesig%>%
+  dmasights<-zonesig%>%
     dplyr::select(time,lat,lon,number,sightID)%>%
     distinct(time,lat,lon,number,sightID)%>%
     mutate(corer=round(sqrt(number/(pi*egden)),2))%>%
@@ -308,28 +314,28 @@ if (nrow(fishzonesig) > 0){
   
   centroid<-gCentroid(polyclust_sp,byid=TRUE)
 
-  egfishtrig<-egfishtrig%>%
+  egtrig<-egtrig%>%
     mutate(corer=round(sqrt(number/(pi*egden)),2))
   
   leafpal <- colorFactor(palette = rev("RdPu"), 
-                         domain = egfishtrig$number)
+                         domain = egtrig$number)
   
   leafpal2 <- colorFactor(palette = rev("RdPu"), 
-                         domain = egfishtrig$corer)
+                         domain = egtrig$corer)
   
-  if(max(egfishtrig$lon)-min(egfishtrig$lon) < 0.2 | max(egfishtrig$lat)-min(egfishtrig$lat) < 0.2){
-    minlon<-min(egfishtrig$lon)+0.1
-    minlat<-min(egfishtrig$lat)-0.1
-    maxlon<-max(egfishtrig$lon)-0.1
-    maxlat<-max(egfishtrig$lat)+0.1
+  if(max(egtrig$lon)-min(egtrig$lon) < 0.2 | max(egtrig$lat)-min(egtrig$lat) < 0.2){
+    minlon<-min(egtrig$lon)+0.1
+    minlat<-min(egtrig$lat)-0.1
+    maxlon<-max(egtrig$lon)-0.1
+    maxlat<-max(egtrig$lat)+0.1
   } else {
-    minlon<-min(egfishtrig$lon)
-    minlat<-min(egfishtrig$lat)
-    maxlon<-max(egfishtrig$lon)
-    maxlat<-max(egfishtrig$lat)
+    minlon<-min(egtrig$lon)
+    minlat<-min(egtrig$lat)
+    maxlon<-max(egtrig$lon)
+    maxlat<-max(egtrig$lat)
   }
   
-  mapbase<-leaflet(data = egfishtrig, options = leafletOptions(zoomControl = FALSE)) %>% 
+  mapbase<-leaflet(data = egtrig, options = leafletOptions(zoomControl = FALSE)) %>% 
     addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
     addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
     addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
@@ -337,14 +343,14 @@ if (nrow(fishzonesig) > 0){
     fitBounds(minlon,minlat,maxlon,maxlat)
   
  map1<-mapbase%>%
-   addCircleMarkers(lng = ~egfishtrig$lon, lat = ~egfishtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egfishtrig$number), popup = paste0(egfishtrig$time,", Group Size:", egfishtrig$number))%>%
-   addLegend(pal = leafpal, values = egfishtrig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
+   addCircleMarkers(lng = ~egtrig$lon, lat = ~egtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egtrig$number), popup = paste0(egtrig$time,", Group Size:", egtrig$number))%>%
+   addLegend(pal = leafpal, values = egtrig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
    addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
 
  map2<-mapbase%>%
    addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
-   addCircleMarkers(lng = ~egfishtrig$lon, lat = ~egfishtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egfishtrig$number), popup = paste0(egfishtrig$time,", Group Size:", egfishtrig$number))%>%
-   addLegend(pal = leafpal2, values = egfishtrig$corer, opacity = 0.9, position = "topleft", title = "Whale Density Radius (nm)")%>%
+   addCircleMarkers(lng = ~egtrig$lon, lat = ~egtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egtrig$number), popup = paste0(egtrig$time,", Group Size:", egtrig$number))%>%
+   addLegend(pal = leafpal2, values = egtrig$corer, opacity = 0.9, position = "topleft", title = "Whale Density Radius (nm)")%>%
    addLegend(colors = c("green","orange","grey"), labels = c("Dynamic Shipping Section","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
 
  map3<-mapbase%>%    
