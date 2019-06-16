@@ -32,7 +32,9 @@ library(tinytex)
 library(webshot)
 library(zoo)
 ```
-Additionally, you will need to have PhantomJS, which you can install by running the code below:
+You will need to have PhantomJS, which you can install by running the code below:
 ```
 webshot::install_phantomjs()
 ```
+
+Last but not least, if you do not get TRUE when you run `tinytex:::is_tinytex()`, then you probably need to run this: `tinytex::install_tinytex(force=TRUE)`. More info on this process and the TinyTex package can be found here: https://yihui.name/tinytex/
