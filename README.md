@@ -32,3 +32,7 @@ library(tinytex)
 library(webshot)
 library(zoo)
 ```
+Additionally, you will need to have PhantomJS, which you can install by running the code below:
+```
+webshot::install_phantomjs()
+```
