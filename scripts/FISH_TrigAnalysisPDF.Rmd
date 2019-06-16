@@ -3,7 +3,7 @@ title:  "`r paste('North Atlantic Right Whale Sightings Outside Dynamic Fishing 
 params:
   sigdate: NA
   webshotpath: NA
-geometry: margin=1cm
+geometry: margin=1.5cm
 output: pdf_document
 classoption: landscape
 ---
