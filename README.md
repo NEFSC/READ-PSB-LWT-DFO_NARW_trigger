@@ -1,4 +1,4 @@
-# DFO Right Whale Sightings Trigger Analysis
+# DFO/TC Right Whale Sightings Trigger Analysis
 
 Required packages include:
 
