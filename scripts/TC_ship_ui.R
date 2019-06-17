@@ -16,10 +16,13 @@ fluidPage(
       (HTML(paste('<br/>',
                   "CSV must include only right whale sightings and have at least these fields:",'<br/>',
                   '<br/>',
-                  "time (D/M/YYYY 24HH:MM), lat, lon, number"
+                  "time (D/M/YYYY 24HH:MM), lat, lon, number",'<br/>',
+                  '<br/>',
+                  "The trigger analysis may take a minute or two."
                   ))),
       br(),#space
-      #uiOutput("finalmess"),
+      br(),#space
+      textOutput("trigmessage"),
       br(),
       splitLayout(leafletOutput("map1"),leafletOutput("map2"),
       width = 2),
