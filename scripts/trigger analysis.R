@@ -62,6 +62,7 @@ egden<-0.0416
 #########################################
 
 if (FALSE %in% egtrig$dyneval) {
+
   ##only taking ACTION_NEW = na
   actionna<-egtrig %>% dplyr::select("time", "lat", "lon", "number","sightID")
   ##distance between points matrix -- compares right whale sightings positions to each other
@@ -95,7 +96,6 @@ if (FALSE %in% egtrig$dyneval) {
   
   print(zonesig)
   ##############
-}
 
 ################
 ##Create Zone ##
@@ -389,7 +389,16 @@ output$map1<-renderLeaflet({map1})
 output$map2<-renderLeaflet({map2})
 output$map3<-renderLeaflet({map3})
 output$map4<-renderLeaflet({map4})
-
+enable("mappdf")
+}
+  
+} else {
+  disable("mappdf")
+  output$map1<-renderLeaflet({})
+  output$map2<-renderLeaflet({})
+  output$map3<-renderLeaflet({})
+  output$map4<-renderLeaflet({})
+  output$trigmessage<-renderText({"All right whale sightings fall within dynamic zones and do not trigger additional protections."})
 }
 
 
