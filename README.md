@@ -44,5 +44,4 @@ Finally, if you do not get TRUE when you run `tinytex:::is_tinytex()`, then you 
 ## Running the App
 The app can be launched by running `shiny::runGitHub("DFO_dyna", username = "leeyuhc", ref = "master")` in your RStudio environment. Click 'Run App' to get started. In the window that pops up, click "Open in Browser".
 
-
-![](visual_instructions/browser.png)
+![](visual_instructions/browser.PNG)
