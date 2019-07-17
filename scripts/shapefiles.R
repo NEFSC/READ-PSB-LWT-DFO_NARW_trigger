@@ -12,7 +12,7 @@
 ######
 crab_grid<-readOGR(shapepath, layer = "Snow_Crab_Grids")
 dyna_ship<-readOGR(shapepath, layer = "Dynamic_Shipping_Section")
-slow_0719<-readOGR(smapath, layer = "SlowZoneJuly2019")
+slow_0719<-readOGR(shapepath, layer = "SlowZoneJuly2019")
 #stat_fish<-readOGR(shapepath, layer = "Static_Fishing_Closure")
 GSL_grid<-readOGR(shapepath, layer = "cropped_full_grid")
 ##france
