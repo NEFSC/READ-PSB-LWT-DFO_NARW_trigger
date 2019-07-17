@@ -16,7 +16,7 @@ slow_0719<-readOGR(smapath, layer = "SlowZoneJuly2019")
 #stat_fish<-readOGR(shapepath, layer = "Static_Fishing_Closure")
 GSL_grid<-readOGR(shapepath, layer = "cropped_full_grid")
 ##france
-#spm<-readOGR(shapepath, layer = "spm")
+spm<-readOGR(shapepath, layer = "spm")
 
 ## projected properly
 ##dynamic fishing grid
@@ -28,11 +28,12 @@ slow_0719.tr<-spTransform(slow_0719, CRS.new)
 ##full fishing grid
 GSL_grid.tr<-spTransform(GSL_grid, CRS.new)
 #st. pierre et micquelon
-#spm<-spTransform(spm, CRS.new)
+spm.tr<-spTransform(spm, CRS.new)
 
 ######  
 crab_grid.sp<-spTransform(crab_grid.tr,CRS.latlon)
 dyna_ship.sp<-spTransform(dyna_ship.tr,CRS.latlon)
 slow_0719.sp<-spTransform(slow_0719.tr,CRS.latlon)
 GSL_grid.sp<-spTransform(GSL_grid.tr,CRS.latlon)
+spm.sp<-spTransform(spm.tr,CRS.latlon)
 
