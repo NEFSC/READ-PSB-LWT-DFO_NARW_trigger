@@ -336,6 +336,7 @@ if (nrow(zonesig) > 0){
   
   mapbase<-leaflet(data = egtrig, options = leafletOptions(zoomControl = FALSE)) %>% 
     addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
+    addPolygons(data = spm.sp, weight = 2, color = "white") %>%
     addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
     addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
     addPolylines(data = slow_0719.sp, weight = 2, color = "red", opacity = 0.3)%>%
@@ -362,7 +363,7 @@ if (nrow(zonesig) > 0){
    addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
    addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
    addLegend(colors = c("red"), labels = "Calculated Center of Core Area", opacity = 0.9, position = "topleft")%>%
-   addLegend(colors = c("green","red","orange","grey"), labels = c("Dynamic Shipping Section","Speed Restriction Zone",,"Dynamic Fishing Grid","Full Fishing Grid","Core Area"), opacity = 0.3, position = "topleft")
+   addLegend(colors = c("green","red","orange","grey"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","Core Area"), opacity = 0.3, position = "topleft")
 
  
  webshotpath<-paste0(getwd(),"/",sigdate,"_map")
