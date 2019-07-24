@@ -3,6 +3,7 @@ fluidPage(
   titlePanel("TC Trigger Analysis - Potential Shipping Speed Restriction Zones"),
   sidebarLayout(
     sidebarPanel(
+      textInput("bzone","Buffer Zone Around Core Area (nm)", placeholder = "15"),
       fileInput("egcanada", "Choose CSV File",
                 accept = c(
                   "text/csv",
