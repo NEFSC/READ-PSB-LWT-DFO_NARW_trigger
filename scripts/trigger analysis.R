@@ -291,6 +291,8 @@ if (nrow(zonesig) > 0){
   
   corebounds<-rbind(corebounds_nw,corebounds_sw,corebounds_se,corebounds_ne,corebounds_nw)
   
+  ###################
+  
   incProgress(1/5) #for progress bar
   #make the bounds a polygon
   IDclust<-split(corebounds, corebounds$cluster)
@@ -316,6 +318,10 @@ if (nrow(zonesig) > 0){
   egtrig<-egtrig%>%
     mutate(corer=round(sqrt(number/(pi*egden)),2))
   
+  
+  #############
+  ## mapping ##
+  #############
   leafpal <- colorFactor(palette = rev("RdPu"), 
                          domain = egtrig$number)
   
