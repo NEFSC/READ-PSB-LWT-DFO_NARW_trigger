@@ -5,6 +5,7 @@ params:
   webshotpath: NA
   bothbounds: NA
   boundscap: NA
+  cent_df: NA
 geometry: margin=1.5cm
 output: pdf_document
 classoption: landscape
@@ -18,6 +19,9 @@ knitr::include_graphics(c(paste0(params$webshotpath,"3.png"),paste0(params$websh
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis', out.width = '45%', fig.align="center"}
 knitr::include_graphics(paste0(params$webshotpath,"5.png"))
+```
+```{r echo = FALSE, warning = FALSE, results = 'asis'}
+knitr::kable(params$cent_df, caption = "Centroid coordinates")
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis'}
 knitr::kable(params$bothbounds, caption = params$boundscap)
