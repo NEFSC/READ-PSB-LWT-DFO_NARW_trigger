@@ -314,7 +314,15 @@ if (nrow(zonesig) > 0){
     dplyr::rename("ID" = "id", "VERTEX" = "order")
   
   centroid<-gCentroid(polyclust_sp,byid=TRUE)
-
+  cent_df<-as.data.frame(centroid)
+  cent_df<-cent_df%>%
+    dplyr::rename("Latitude" = "y", "Longitude" = "x")%>%
+    mutate(ID = 1:n())%>%
+    dplyr::select(ID,Latitude, Longitude)
+  print(cent_df)
+  values$cent_df<-cent_df
+  output$centroidtable<-renderTable({cent_df},  striped = TRUE)
+  
   egtrig<-egtrig%>%
     mutate(corer=round(sqrt(number/(pi*egden)),2))
   
@@ -346,6 +354,7 @@ if (nrow(zonesig) > 0){
     addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
     addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
     addPolylines(data = slow_0719.sp, weight = 2, color = "red", opacity = 0.3)%>%
+    addPolylines(data = fath_1020.sp, weight = 2, color = "sandybrown")%>%
     addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center")) %>%
     fitBounds(minlon,minlat,maxlon,maxlat)
   
@@ -368,8 +377,9 @@ if (nrow(zonesig) > 0){
  map4<-mapbase%>%
    addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
    addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
+   addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")%>%
    addLegend(colors = c("red"), labels = "Calculated Center of Core Area", opacity = 0.9, position = "topleft")%>%
-   addLegend(colors = c("green","red","orange","grey","blue"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","Core Area"), opacity = 0.3, position = "topleft")
+   addLegend(colors = c("green","red","orange","grey","yellow","blue"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","Core Area"), opacity = 0.3, position = "topleft")
 
  
  webshotpath<-paste0(getwd(),"/",sigdate,"_map")
