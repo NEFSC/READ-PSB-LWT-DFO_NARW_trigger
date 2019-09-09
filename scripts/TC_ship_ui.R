@@ -11,6 +11,10 @@ fluidPage(
                   ".csv")),
       br(),#space
       br(),#space
+      "Centroid:",
+      tableOutput("centroidtable"),
+      br(),#space
+      "Dynamic area boundaries:",
       tableOutput("bothbounds"),
       br(),#space
       downloadButton("mappdf","Download"),
