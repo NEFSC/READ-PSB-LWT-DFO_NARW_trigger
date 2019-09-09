@@ -48,7 +48,7 @@ observe({
         file.copy("FISH_TrigAnalysisPDF.Rmd", tempReport, overwrite = FALSE)
         print("button pressed")
         
-        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath)
+        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath, cent_df = values$cent_df)
         
         rmarkdown::render(tempReport, output_file = file,
                           params = params,
