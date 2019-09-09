@@ -8,6 +8,11 @@ fluidPage(
                   "text/csv",
                   "text/comma-separated-values,text/plain",
                   ".csv")),
+      br(),#space
+      br(),#space
+      "Centroid:",
+      tableOutput("centroidtable"),
+      br(),#space
       downloadButton("mappdf","Download")
       ),
     mainPanel(
