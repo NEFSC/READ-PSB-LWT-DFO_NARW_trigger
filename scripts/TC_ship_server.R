@@ -158,7 +158,7 @@ observe({
         file.copy("SHIP_TrigAnalysisPDF.Rmd", tempReport, overwrite = FALSE)
         print("button pressed")
         
-        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath, bothbounds = values$bothbounds, boundscap = values$boundscap)
+        params<-list(sigdate = values$sigdate, webshotpath = values$webshotpath, bothbounds = values$bothbounds, boundscap = values$boundscap, cent_df = values$cent_df)
         
         rmarkdown::render(tempReport, output_file = file,
                           params = params,
