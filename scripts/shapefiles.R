@@ -25,8 +25,8 @@ spm<-readOGR(shapepath, layer = "spm")
   ##critical habitat
 crit_habi<-readOGR(shapepath, layer = "NARW_Critical_Habitat")
   ##10 & 20 fathom lines
-  ## need to subset this
-fath_1020<-readOGR(shapepath, layer = "10_and_20_fathom_lines_ATLCAN")
+fath_10<-readOGR(shapepath, layer = "fath_10")
+fath_20<-readOGR(shapepath, layer = "fath_20")
 
 ## projected properly
 crab_grid.tr<-spTransform(crab_grid, CRS.new)
@@ -35,8 +35,8 @@ slow_0719.tr<-spTransform(slow_0719, CRS.new)
 GSL_grid.tr<-spTransform(GSL_grid, CRS.new)
 spm.tr<-spTransform(spm, CRS.new)
 crit_habi.tr<-spTransform(crit_habi, CRS.new)
-fath_1020.tr<-spTransform(fath_1020, CRS.new)
-
+fath_10.tr<-spTransform(fath_10, CRS.new)
+fath_20.tr<-spTransform(fath_20, CRS.new)
 
 ######  
 crab_grid.sp<-spTransform(crab_grid.tr,CRS.latlon)
@@ -45,4 +45,5 @@ slow_0719.sp<-spTransform(slow_0719.tr,CRS.latlon)
 GSL_grid.sp<-spTransform(GSL_grid.tr,CRS.latlon)
 spm.sp<-spTransform(spm.tr,CRS.latlon)
 crit_habi.sp<-spTransform(crit_habi.tr, CRS.latlon)
-fath_1020.sp<-spTransform(fath_1020.tr, CRS.latlon)
+fath_10.sp<-spTransform(fath_10.tr, CRS.latlon)
+fath_20.sp<-spTransform(fath_20.tr, CRS.latlon)
