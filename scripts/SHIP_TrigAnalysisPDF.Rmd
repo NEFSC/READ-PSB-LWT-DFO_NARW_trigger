@@ -18,7 +18,7 @@ knitr::include_graphics(c(paste0(params$webshotpath,"1.png"),paste0(params$websh
 knitr::include_graphics(c(paste0(params$webshotpath,"3.png"),paste0(params$webshotpath,"4.png")))
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis', out.width = '45%', fig.align="center"}
-knitr::include_graphics(paste0(params$webshotpath,"5.png"))
+knitr::include_graphics(c(paste0(params$webshotpath,"5.png"),paste0(getwd(),"/mapbase.png")))
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis'}
 knitr::kable(params$cent_df, caption = "Centroid coordinates")
