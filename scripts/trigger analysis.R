@@ -354,34 +354,40 @@ if (nrow(zonesig) > 0){
     addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
     addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
     addPolylines(data = slow_0719.sp, weight = 2, color = "red", opacity = 0.3)%>%
-    addPolylines(data = fath_1020.sp, weight = 2, color = "sandybrown")%>%
-    addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center")) %>%
+    addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
+    addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
+    addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")
+  
+  #this section was used to make mapbase for the pdf output, but it does not need to be run every time. Only if shapes change. Go to line 409.
+   # mapb<-mapbase%>%
+   #   addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.1)%>%
+   #   addLegend(colors = c("green","red","orange","grey","yellow","white"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","SPM EEZ"), opacity = 0.3, position = "bottomright")%>%
+   #   addLegend(colors = c("orange","brown"), labels = c("10 fathom line", "20 fathom line"), opacity = 0.9, position = "bottomright")
+
+  mapbase<-mapbase%>%
+    addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
   
  map1<-mapbase%>%
    addCircleMarkers(lng = ~egtrig$lon, lat = ~egtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egtrig$number), popup = paste0(egtrig$time,", Group Size:", egtrig$number))%>%
-   addLegend(pal = leafpal, values = egtrig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
-   addLegend(colors = c("green","red","orange","grey"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
-
+   addLegend(pal = leafpal, values = egtrig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")
+ 
  map2<-mapbase%>%
    addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
    addCircleMarkers(lng = ~egtrig$lon, lat = ~egtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egtrig$number), popup = paste0(egtrig$time,", Group Size:", egtrig$number))%>%
-   addLegend(pal = leafpal2, values = egtrig$corer, opacity = 0.9, position = "topleft", title = "Whale Density Radius (nm)")%>%
-   addLegend(colors = c("green","red","orange","grey"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid"), opacity = 0.3, position = "topleft")
+   addLegend(pal = leafpal2, values = egtrig$corer, opacity = 0.9, position = "topleft", title = "Whale Density Radius (nm)")
 
  map3<-mapbase%>%    
    addPolygons(data = polycoorddf_sp, weight = 2, color = "black",fill = F)%>%
    addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
-   addLegend(colors = c("green","red","orange","grey","blue"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","Core Area"), opacity = 0.3, position = "topleft")
+   addLegend(colors = c("blue"), labels = c("Core Area"), opacity = 0.3, position = "topleft")
  
  map4<-mapbase%>%
    addCircleMarkers(data = centroid, weight = 2, color = "red", fillOpacity = 1, radius = 5) %>%
    addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
-   addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")%>%
    addLegend(colors = c("red"), labels = "Calculated Center of Core Area", opacity = 0.9, position = "topleft")%>%
-   addLegend(colors = c("green","red","orange","grey","yellow","blue"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","Core Area"), opacity = 0.3, position = "topleft")
-
- 
+   addLegend(colors = c("blue"), labels = c("Core Area"), opacity = 0.3, position = "topleft")
+   
  webshotpath<-paste0(getwd(),"/",sigdate,"_map")
  print(webshotpath)
  
@@ -399,7 +405,11 @@ print("map 2")
 snap(map3,3)
 print("map 3") 
 snap(map4,4) 
-print("map 4") 
+print("map 4")
+#this section was used to output mapbase, but it does not need to be run everytime. Only need to run if something changes.
+#should make this an if clause
+ # snap(mapb,"ase") 
+ # print("mapb")
 
 incProgress(1/5) #for progress bar
 
