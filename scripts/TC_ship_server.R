@@ -123,7 +123,7 @@ observe({
         addPolygons(data = polyclust_sp, weight = 2, color = "blue")%>%
         addPolygons(data = polyclust_spbuff, weight = 2, color = "purple")%>%
         addLegend(colors = c("red"), labels = "Calculated Center of Core Area", opacity = 0.9, position = "topleft")%>%
-        addLegend(colors = c("green","red","orange","grey","blue","purple"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","Core Area","Buffer Zone"), opacity = 0.3, position = "topleft")%>%
+        addLegend(colors = c("blue","purple"), labels = c("Core Area","Buffer Zone"), opacity = 0.3, position = "topleft")%>%
         clearBounds()%>%
         fitBounds(minlonb,minlatb,maxlonb,maxlatb)
       
