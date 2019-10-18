@@ -360,12 +360,12 @@ if (nrow(zonesig) > 0){
   
   #this section was used to make mapbase for the pdf output, but it does not need to be run every time. Only if shapes change. Go to line 409.
    # mapb<-mapbase%>%
-   #   addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.1)%>%
+   #   addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.1)%>%
    #   addLegend(colors = c("green","red","orange","grey","yellow","white"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","SPM EEZ"), opacity = 0.3, position = "bottomright")%>%
    #   addLegend(colors = c("orange","brown"), labels = c("10 fathom line", "20 fathom line"), opacity = 0.9, position = "bottomright")
 
   mapbase<-mapbase%>%
-    addPolygons(data = GSL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = GSL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
+    addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
   
  map1<-mapbase%>%
