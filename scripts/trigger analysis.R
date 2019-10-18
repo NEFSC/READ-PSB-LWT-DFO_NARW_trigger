@@ -76,8 +76,6 @@ if (FALSE %in% egtrig$dyneval) {
                                                            matrix(c(lon2, lat2), ncol =2), 
                                                            a=6378137, f=1/298.257222101)*m_nm]
   print(combo)
-  combo%>%as.data.frame()%>%
-    filter(sightID == 28)
   #filters out points compared where core radius is less than the distance between them and
   #keeps the single sightings where group size alone would be enough to trigger a DMA (0 nm dist means it is compared to itself)
   #I don't remember why I named this dmacand -- maybe dma combo and... then some?
@@ -85,6 +83,9 @@ if (FALSE %in% egtrig$dyneval) {
     dplyr::filter((combo$dist_nm != 0 & combo$dist_nm <= combo$corer) | (combo$number > 2 & combo$dist_nm == 0))
   print("dmacand")
   print(dmacand)
+  if (nrow(dmacand) == 0){
+    output$trigmessage<-renderText({"Sightings do not trigger a closure"})
+  }
   ##filters for all distinct sightings that should be considered for DMA calculation
   dmasightID<-data.frame(sightID = c(dmacand$sightID,dmacand$sightID2)) %>%
     distinct()
