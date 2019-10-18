@@ -359,10 +359,11 @@ if (nrow(zonesig) > 0){
     addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")
   
   #this section was used to make mapbase for the pdf output, but it does not need to be run every time. Only if shapes change. Go to line 409.
-   # mapb<-mapbase%>%
+  #need to also uncomment the snap in lines 412 & 413 below 
+  # mapb<-mapbase%>%
    #   addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.1)%>%
-   #   addLegend(colors = c("green","red","orange","grey","yellow","white"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","SPM EEZ"), opacity = 0.3, position = "bottomright")%>%
-   #   addLegend(colors = c("orange","brown"), labels = c("10 fathom line", "20 fathom line"), opacity = 0.9, position = "bottomright")
+   #   addLegend(colors = c("green","red","orange","grey","yellow","white"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","SPM EEZ"), opacity = 0.3, position = "topleft")%>%
+   #   addLegend(colors = c("orange","brown"), labels = c("10 fathom line", "20 fathom line"), opacity = 0.9, position = "topright")
 
   mapbase<-mapbase%>%
     addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
@@ -408,7 +409,7 @@ snap(map4,4)
 print("map 4")
 #this section was used to output mapbase, but it does not need to be run everytime. Only need to run if something changes.
 #should make this an if clause
- # snap(mapb,"ase") 
+ # snap(mapb,"ase")
  # print("mapb")
 
 incProgress(1/5) #for progress bar
