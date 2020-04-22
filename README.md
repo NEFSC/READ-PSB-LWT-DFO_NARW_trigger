@@ -42,6 +42,6 @@ webshot::install_phantomjs()
 Finally, if you do not get TRUE when you run `tinytex:::is_tinytex()`, then you probably need to run this: `tinytex::install_tinytex(force=TRUE)`. More info on this process and the TinyTex package can be found here: https://yihui.name/tinytex/
 
 ## Running the App
-The app can be launched by running `shiny::runGitHub("DFO_dyna", username = "leeyuhc", ref = "master")` in your RStudio environment. Click 'Run App' to get started. In the window that pops up, click "Open in Browser".
+The app can be launched by running `shiny::runGitHub("DFO_dyna", username = "leahcrowe", ref = "master")` in your RStudio environment. Click 'Run App' to get started. In the window that pops up, click "Open in Browser".
 
 ![](visual_instructions/browser.PNG)
