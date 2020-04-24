@@ -1,6 +1,6 @@
 #############################################
 ## App file for DFO dynamic management APP ##
-## Leah Crowe 2019                         ##
+## Leah Crowe 2019, updated for 2020       ##
 #############################################
 
 
