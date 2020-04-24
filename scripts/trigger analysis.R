@@ -19,6 +19,26 @@ proj4string(eg)<-CRS.latlon
 ##change projection
 eg.tr<-spTransform(eg, CRS.new)
 
+ymin = min(egdaily$lat) - 0.5
+ymax = max(egdaily$lat) + 0.5
+xmin = min(egdaily$lon) - 0.5
+xmax = max(egdaily$lon) + 0.5
+
+##trim the fishing grid to where the sightings are to speed it up
+ATL_grid.sp<-st_crop(ATL_grid.sp, ymin = ymin, xmin = xmin, ymax = ymax, xmax = xmax)
+
+#global options
+###############################################
+webshotpath<-paste0(getwd(),"/",sigdate,"_map")
+print(webshotpath)
+
+snap<-function(x,y){
+  
+  htmlwidgets::saveWidget(x, "temp.html", selfcontained = FALSE)
+  webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"), vwidth = 600, vheight = 450)
+  
+}
+
 ###################################
 ## Evaluating Over Dynamic Zones ##
 ###################################
@@ -29,14 +49,18 @@ eg.tr<-spTransform(eg, CRS.new)
 ############
 if(FS == 'FISH'){
   ##evaluate sightings over the dynamic fishing grid
-  dynfish<-!is.na(sp::over(eg.tr, as(crab_grid.tr, "SpatialPolygons")))
-  ##filter for eg sightings that should be evaluated for dynamic fishing closures
+  dynfish<-!is.na(sp::over(eg.tr, as(dynafish.tr, "SpatialPolygons")))
+  ##filter for eg sightings that fall outside of BOF and GSL for dynamic fishing closures
   egtrig<-egdaily%>%
     mutate(dyneval = dynfish)%>%
     filter(dyneval == FALSE)
+  ##filter for eg sightings that fall inside of BOF or GSL
+  eg1trig<-egdaily%>%
+    mutate(dyneval = dynfish)%>%
+    filter(dyneval == TRUE)
 } else if (FS == 'SHIP'){
   ##evaluate sightings over the dynamic shipping grid
-  dynship<-!is.na(sp::over(eg.tr, as(dyna_ship.tr, "SpatialPolygons")))
+  dynship<-!is.na(sp::over(eg.tr, as(dynaship.tr, "SpatialPolygons")))
   ##filter for eg sightings that should be evaluated for dynamic shipping speed zones
   egtrig<-egdaily%>%
     mutate(dyneval = dynship)%>%
@@ -44,13 +68,12 @@ if(FS == 'FISH'){
     
 }
 ############
-##add something here that asks if sightings are in France
+##consider adding something here that asks if sightings are in France (SPM)
 
 ######################
 ## trigger analysis ##
 ######################
 
-#########
 #spatial analysis
 ## 1 nautical mile is 1852 meters
 m_nm<-1/1852
@@ -352,9 +375,9 @@ if (nrow(zonesig) > 0){
   mapbase<-leaflet(data = egtrig, options = leafletOptions(zoomControl = FALSE)) %>% 
     addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
     addPolygons(data = spm.sp, weight = 2, color = "white") %>%
-    addPolygons(data = dyna_ship.sp, weight = 2, color = "green") %>%
-    addPolygons(data = crab_grid.sp, weight = 2, color = "orange") %>%
-    addPolylines(data = slow_0719.sp, weight = 2, color = "red", opacity = 0.3)%>%
+    addPolygons(data = dynaship.sp, weight = 2, color = "green") %>%
+    addPolygons(data = dynafish.sp, weight = 2, color = "orange") %>%
+    addPolylines(data = shipzone.sp, weight = 2, color = "red", opacity = 0.3)%>%
     addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
     addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
     addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")
@@ -390,16 +413,6 @@ if (nrow(zonesig) > 0){
    addLegend(colors = c("red"), labels = "Calculated Center of Core Area", opacity = 0.9, position = "topleft")%>%
    addLegend(colors = c("blue"), labels = c("Core Area"), opacity = 0.3, position = "topleft")
    
- webshotpath<-paste0(getwd(),"/",sigdate,"_map")
- print(webshotpath)
- 
- snap<-function(x,y){
- 
- htmlwidgets::saveWidget(x, "temp.html", selfcontained = FALSE)
- webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"), vwidth = 600, vheight = 450)
- 
- }
- 
 snap(map1,1)
 print("map 1")  
 snap(map2,2)
@@ -422,6 +435,48 @@ output$map4<-renderLeaflet({map4})
 enable("mappdf")
 output$trigmessage<-renderText({})
 }
+  
+} else if (TRUE %in% eg1trig$dyneval){
+  
+  if(max(eg1trig$lon)-min(eg1trig$lon) < 0.2 | max(eg1trig$lat)-min(eg1trig$lat) < 0.2){
+    minlon<-min(eg1trig$lon)+0.1
+    minlat<-min(eg1trig$lat)-0.1
+    maxlon<-max(eg1trig$lon)-0.1
+    maxlat<-max(eg1trig$lat)+0.1
+  } else {
+    minlon<-min(eg1trig$lon)
+    minlat<-min(eg1trig$lat)
+    maxlon<-max(eg1trig$lon)
+    maxlat<-max(eg1trig$lat)
+  }
+  
+  print("trig1")
+  leafpal <- colorFactor(palette = rev("RdPu"), 
+                         domain = eg1trig$number)
+  
+  map1<-leaflet(data = eg1trig, options = leafletOptions(zoomControl = FALSE)) %>% 
+    addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
+    addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
+    addPolygons(data = spm.sp, weight = 2, color = "white") %>%
+    addPolygons(data = dynaship.sp, weight = 2, color = "green") %>%
+    addPolygons(data = dynafish.sp, weight = 2, color = "orange") %>%
+    addPolylines(data = shipzone.sp, weight = 2, color = "red", opacity = 0.3)%>%
+    addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
+    addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
+    addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")%>%
+    addCircleMarkers(lng = ~eg1trig$lon, lat = ~eg1trig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(eg1trig$number), popup = paste0(eg1trig$time,", Group Size:", eg1trig$number))%>%
+    addLegend(pal = leafpal, values = eg1trig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
+    fitBounds(minlon,minlat,maxlon,maxlat)
+  
+  snap(map1,1)
+  print("map 1") 
+  
+  output$map1<-renderLeaflet({map1})
+  output$map2<-renderLeaflet({})
+  output$map3<-renderLeaflet({})
+  output$map4<-renderLeaflet({})
+  enable("mappdf")
+  output$trigmessage<-renderText({})
   
 } else {
   disable("mappdf")
