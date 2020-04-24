@@ -11,14 +11,19 @@
   
 ######
 ##import shapefiles
+  
+  ##management measures
   ##dynamic fishing grid
-crab_grid<-readOGR(shapepath, layer = "Snow_Crab_Grids")
-  ##dynamic shipping
-dyna_ship<-readOGR(shapepath, layer = "Dynamic_Shipping_Section")
-  ##shipping slow zone July2019
-slow_0719<-readOGR(shapepath, layer = "SlowZoneJuly2019")
+  dynafish<-readOGR(shapepath, layer = "2020_Dynamic_zone")
   ##Full Atlantic grid that we got from DFO via K. Davies Oct 2019
-ATL_grid<-readOGR(shapepath, layer = "Full_ATL_grids")
+  ATL_grid<-readOGR(shapepath, layer = "Full_ATL_grids")
+  
+  ##dynamic shipping
+  dynaship<-readOGR(shapepath, layer = "shiplane")
+  ##shipping slow zone July2019
+  shipzone<-readOGR(shapepath, layer = "NARW_RZs_2020_02_07")
+
+  ##other
   ##st. pierre et micquelon
 spm<-readOGR(shapepath, layer = "spm")
   ##critical habitat
@@ -28,9 +33,9 @@ fath_10<-readOGR(shapepath, layer = "fath_10")
 fath_20<-readOGR(shapepath, layer = "fath_20")
 
 ## projected properly
-crab_grid.tr<-spTransform(crab_grid, CRS.new)
-dyna_ship.tr<-spTransform(dyna_ship, CRS.new)
-slow_0719.tr<-spTransform(slow_0719, CRS.new)
+dynafish.tr<-spTransform(dynafish, CRS.new)
+dynaship.tr<-spTransform(dynaship, CRS.new)
+shipzone.tr<-spTransform(shipzone, CRS.new)
 ATL_grid.tr<-spTransform(ATL_grid, CRS.new)
 spm.tr<-spTransform(spm, CRS.new)
 crit_habi.tr<-spTransform(crit_habi, CRS.new)
@@ -38,9 +43,9 @@ fath_10.tr<-spTransform(fath_10, CRS.new)
 fath_20.tr<-spTransform(fath_20, CRS.new)
 
 ######  
-crab_grid.sp<-spTransform(crab_grid.tr,CRS.latlon)
-dyna_ship.sp<-spTransform(dyna_ship.tr,CRS.latlon)
-slow_0719.sp<-spTransform(slow_0719.tr,CRS.latlon)
+dynafish.sp<-spTransform(dynafish.tr,CRS.latlon)
+dynaship.sp<-spTransform(dynaship.tr,CRS.latlon)
+shipzone.sp<-spTransform(shipzone.tr,CRS.latlon)
 ATL_grid.sp<-spTransform(ATL_grid.tr,CRS.latlon)
 spm.sp<-spTransform(spm.tr,CRS.latlon)
 crit_habi.sp<-spTransform(crit_habi.tr, CRS.latlon)
