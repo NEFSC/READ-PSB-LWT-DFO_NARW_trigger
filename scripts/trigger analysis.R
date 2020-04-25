@@ -386,9 +386,14 @@ if (nrow(zonesig) > 0){
     maxlat<-max(egtrig$lat)
   }
   
+  
   mapbase<-mapbase%>%
-    addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
+  
+  if (FS == 'FISH'){
+  mapbase<-mapbase%>%
+    addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))
+  } 
   
  map1<-mapbase%>%
    addCircleMarkers(lng = ~egtrig$lon, lat = ~egtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egtrig$number), popup = paste0(egtrig$time,", Group Size:", egtrig$number))%>%
@@ -461,9 +466,13 @@ output$trigmessage<-renderText({})
   # print("mapb")
   ########################
   
+  if (FS == 'FISH'){
+    mapbase<-mapbase%>%
+      addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))
+  } 
+  
   map1<-mapbase %>% 
     addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
-    addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
     addCircleMarkers(lng = ~eg1trig$lon, lat = ~eg1trig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(eg1trig$number), popup = paste0(eg1trig$time,", Group Size:", eg1trig$number))%>%
     addLegend(pal = leafpal, values = eg1trig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
