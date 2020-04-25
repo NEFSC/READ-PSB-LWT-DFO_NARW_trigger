@@ -19,13 +19,13 @@ proj4string(eg)<-CRS.latlon
 ##change projection
 eg.tr<-spTransform(eg, CRS.new)
 
-ymin = min(egdaily$lat) - 0.5
-ymax = max(egdaily$lat) + 0.5
-xmin = min(egdaily$lon) - 0.5
-xmax = max(egdaily$lon) + 0.5
+ymin = min(egdaily$lat) - 0.75
+ymax = max(egdaily$lat) + 0.75
+xmin = min(egdaily$lon) - 0.75
+xmax = max(egdaily$lon) + 0.75
 
-##trim the fishing grid to where the sightings are to speed it up
-ATL_grid.sp<-st_crop(ATL_grid.sp, ymin = ymin, xmin = xmin, ymax = ymax, xmax = xmax)
+##trim the fishing grid to where the sightings are to speed it up bit
+ATL_grid.crop<-st_crop(ATL_grid.sp, ymin = ymin, xmin = xmin, ymax = ymax, xmax = xmax)
 
 #global options
 ###############################################
@@ -38,6 +38,16 @@ snap<-function(x,y){
   webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"), vwidth = 600, vheight = 450)
   
 }
+
+mapbase<-leaflet(data = egdaily, options = leafletOptions(zoomControl = FALSE)) %>% 
+  addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
+  addPolygons(data = spm.sp, weight = 2, color = "white") %>%
+  addPolygons(data = dynafish.sp, weight = 2, color = "black") %>%
+  addPolygons(data = dynaship.sp, weight = 3, color = "green", opacity = 0.8) %>%
+  addPolylines(data = shipzone.sp, weight = 2, color = "red")%>%
+  addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
+  addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
+  addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")
 
 ###################################
 ## Evaluating Over Dynamic Zones ##
@@ -65,6 +75,10 @@ if(FS == 'FISH'){
   egtrig<-egdaily%>%
     mutate(dyneval = dynship)%>%
     filter(dyneval == FALSE)
+  #filter for when one eg sighting triggers something (in shipping lanes)
+  eg1trig<-egdaily%>%
+    mutate(dyneval = dynship)%>%
+    filter(dyneval == TRUE)
     
 }
 ############
@@ -372,25 +386,8 @@ if (nrow(zonesig) > 0){
     maxlat<-max(egtrig$lat)
   }
   
-  mapbase<-leaflet(data = egtrig, options = leafletOptions(zoomControl = FALSE)) %>% 
-    addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
-    addPolygons(data = spm.sp, weight = 2, color = "white") %>%
-    addPolygons(data = dynaship.sp, weight = 2, color = "green") %>%
-    addPolygons(data = dynafish.sp, weight = 2, color = "orange") %>%
-    addPolylines(data = shipzone.sp, weight = 2, color = "red", opacity = 0.3)%>%
-    addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
-    addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
-    addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")
-  
-  #this section was used to make mapbase for the pdf output, but it does not need to be run every time. Only if shapes change. Go to line 409.
-  #need to also uncomment the snap in lines 412 & 413 below 
-  # mapb<-mapbase%>%
-   #   addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.1)%>%
-   #   addLegend(colors = c("green","red","orange","grey","yellow","white"), labels = c("Dynamic Shipping Section","Speed Restriction Zone","Dynamic Fishing Grid","Full Fishing Grid","NARW Critical Habitat","SPM EEZ"), opacity = 0.3, position = "topleft")%>%
-   #   addLegend(colors = c("orange","brown"), labels = c("10 fathom line", "20 fathom line"), opacity = 0.9, position = "topright")
-
   mapbase<-mapbase%>%
-    addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
+    addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
   
  map1<-mapbase%>%
@@ -421,10 +418,6 @@ snap(map3,3)
 print("map 3") 
 snap(map4,4) 
 print("map 4")
-#this section was used to output mapbase, but it does not need to be run everytime. Only need to run if something changes.
-#should make this an if clause
- # snap(mapb,"ase")
- # print("mapb")
 
 incProgress(1/5) #for progress bar
 
@@ -454,23 +447,30 @@ output$trigmessage<-renderText({})
   leafpal <- colorFactor(palette = rev("RdPu"), 
                          domain = eg1trig$number)
   
-  map1<-leaflet(data = eg1trig, options = leafletOptions(zoomControl = FALSE)) %>% 
+  #########################
+  #this section was used to make mapbase for the pdf output, but it does not need to be run every time. Only if shapes change. Go to line 409.
+  #need to also uncomment the snap for mapb below 
+  # mapb<-mapbase%>%
+  #   addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.1)%>%
+  #   addLegend(colors = c("green","red","black","grey","yellow","white"), labels = c("Dynamic Shipping Section","Speed Restriction Zones","1 Whale Trigger Fishing Area","Full Fishing Grid","NARW Critical Habitat","SPM EEZ"), opacity = 0.3, position = "topleft")%>%
+  #   addLegend(colors = c("orange","brown"), labels = c("10 fathom line", "20 fathom line"), opacity = 0.9, position = "topright")
+  # 
+  # #this section was used to output mapbase, but it does not need to be run everytime. Only need to run if something changes.
+  # #should make this an if clause
+  # snap(mapb,"ase")
+  # print("mapb")
+  ########################
+  
+  map1<-mapbase %>% 
     addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
-    addPolygons(data = ATL_grid.sp, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.sp$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
-    addPolygons(data = spm.sp, weight = 2, color = "white") %>%
-    addPolygons(data = dynaship.sp, weight = 2, color = "green") %>%
-    addPolygons(data = dynafish.sp, weight = 2, color = "orange") %>%
-    addPolylines(data = shipzone.sp, weight = 2, color = "red", opacity = 0.3)%>%
-    addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
-    addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
-    addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")%>%
+    addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))%>%
     addCircleMarkers(lng = ~eg1trig$lon, lat = ~eg1trig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(eg1trig$number), popup = paste0(eg1trig$time,", Group Size:", eg1trig$number))%>%
     addLegend(pal = leafpal, values = eg1trig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
   
   snap(map1,1)
   print("map 1") 
-  
+
   output$map1<-renderLeaflet({map1})
   output$map2<-renderLeaflet({})
   output$map3<-renderLeaflet({})

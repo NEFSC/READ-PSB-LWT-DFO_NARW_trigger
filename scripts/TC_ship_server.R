@@ -32,7 +32,8 @@ observe({
     incProgress(1/5)
     source('./scripts/trigger analysis.R', local = TRUE)$value
     enable("mappdf")
-    
+
+    if (FALSE %in% egtrig$dyneval) {    
     #################
     ## Buffer Zone ##
     #################
@@ -143,8 +144,10 @@ observe({
       values$bothbounds<-bothbounds%>%
         filter(VERTEX != 5)
       output$bothbounds<-renderTable({values$bothbounds},  striped = TRUE)
-      
-    })
+     
+    }  
+       
+    }) #progress bar
   }
 
 })
