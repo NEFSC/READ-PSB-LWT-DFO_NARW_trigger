@@ -2,3 +2,4 @@
 /temp_files/*
 *.log
 temp.html
+.Rproj.user
