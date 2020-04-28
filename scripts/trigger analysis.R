@@ -489,8 +489,6 @@ output$trigmessage<-renderText({})
   enable("mappdf")
   output$trigmessage<-renderText({})
   
-  cent_df<-""
-  
 } else {
   disable("mappdf")
   output$map1<-renderLeaflet({})
