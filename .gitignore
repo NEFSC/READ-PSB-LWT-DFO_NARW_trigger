@@ -1,0 +1,4 @@
+*.png
+/temp_files/*
+*.log
+temp.html
