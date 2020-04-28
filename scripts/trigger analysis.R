@@ -29,14 +29,15 @@ ATL_grid.crop<-st_crop(ATL_grid.sp, ymin = ymin, xmin = xmin, ymax = ymax, xmax 
 
 #global options
 ###############################################
-webshotpath<-paste0(getwd(),"/",sigdate,"_map")
+webshotpath<-paste0(getwd(),"/map")
 print(webshotpath)
+unlink("./*.png")
 
 print("start html")
 snap<-function(x,y){
   
   htmlwidgets::saveWidget(x, "temp.html", selfcontained = FALSE)
-  webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"), vwidth = 600, vheight = 450)
+  webshot::webshot("temp.html", file = paste0("map",y,".png"), vwidth = 600, vheight = 450)
   
 }
 print("end html")
@@ -114,14 +115,14 @@ if (FALSE %in% egtrig$dyneval) {
   setDT(combo)[ ,dist_nm:=geosphere::distVincentyEllipsoid(matrix(c(lon,lat), ncol = 2),
                                                            matrix(c(lon2, lat2), ncol =2), 
                                                            a=6378137, f=1/298.257222101)*m_nm]
-  print(combo)
+  #print(combo)
   #filters out points compared where core radius is less than the distance between them and
   #keeps the single sightings where group size alone would be enough to trigger a DMA (0 nm dist means it is compared to itself)
   #I don't remember why I named this dmacand -- maybe dma combo and... then some?
   dmacand<-combo %>%
     dplyr::filter((combo$dist_nm != 0 & combo$dist_nm <= combo$corer) | (combo$number > 2 & combo$dist_nm == 0))
-  print("dmacand")
-  print(dmacand)
+  #print("dmacand")
+  #print(dmacand)
   if (nrow(dmacand) == 0){
     output$trigmessage<-renderText({"Sightings do not trigger a closure"})
   }
@@ -134,7 +135,7 @@ if (FALSE %in% egtrig$dyneval) {
   zonesig<-egdaily%>%
     right_join(dmasightID, by = "sightID")
   
-  print(zonesig)
+  #print(zonesig)
   ##############
 
 ################
@@ -152,11 +153,11 @@ if (nrow(zonesig) > 0){
     distinct(time,lat,lon,number,sightID)%>%
     mutate(corer=round(sqrt(number/(pi*egden)),2))%>%
     as.data.frame()
-  print(dmasights)
-  str(dmasights)
+  #print(dmasights)
+  #str(dmasights)
   
   PolyID<-rownames(dmasights)
-  print(PolyID)
+  #print(PolyID)
   #core radius in meters
   dmasights<-dmasights%>%
     mutate(corer_m = corer*1852,
@@ -178,7 +179,7 @@ if (nrow(zonesig) > 0){
   
   ##gbuffer needs utm to calculate radius in meters
   dmabuff<-gBuffer(dmadf.tr, byid=TRUE, width = dmadf$corer_m, capStyle = "ROUND")
-  print(dmabuff)
+  #print(dmabuff)
   ##data back to latlon dataframe
   ##this will be used later when sightings are clustered by overlapping core radiis
   clustdf<-spTransform(dmadf.tr, CRS.latlon)
@@ -203,8 +204,8 @@ if (nrow(zonesig) > 0){
   pcoord_<-lapply(seq_along(pcoord), function(i) Polygons(list(pcoord[[i]]), ID = names(idpoly)[i]))
   
   polycoorddf_sp<-SpatialPolygons(pcoord_, proj4string = CRS.latlon)
-  print(polycoorddf_sp)
-  print(str(polycoorddf_sp))
+  #print(polycoorddf_sp)
+  #print(str(polycoorddf_sp))
   ##############
   if (length(names(idpoly)) > 1){
     ##Overlap of whale density core area analysis
@@ -257,7 +258,7 @@ if (nrow(zonesig) > 0){
   ##put together the trigger sightings that don't overlap with any other sightings, with those that do with assigned clusters
   totpolyassign<-rbind(polyassign,not)
   totpolyassign$cluster<-as.numeric(totpolyassign$cluster)
-  print(totpolyassign)
+  #print(totpolyassign)
   ##clustmin is for a totpolyassign df without any overlapping triggers
   clustmin = 0
   ##assigns consecutive cluster numbers to those sightings that don't overlap, but are triggering all on their own
@@ -274,7 +275,7 @@ if (nrow(zonesig) > 0){
   #########
   clustdf$PolyID<-as.numeric(clustdf$PolyID)
   clustdf<-full_join(clustdf,totpolyassign,by=c("PolyID"="upoly"))
-  print(clustdf)
+  #print(clustdf)
   
   clusty<-clustdf%>%
     group_by(cluster)%>%
@@ -285,24 +286,24 @@ if (nrow(zonesig) > 0){
     mutate(totes = sum(number))%>%
     filter(totes < 3)
   
-  print(clusty)
-  print(clustn)
+  #print(clusty)
+  #print(clustn)
   
   polycoorddf$id<-as.numeric(polycoorddf$id)
   corepoly<-right_join(polycoorddf, clusty, by=c('id'='PolyID'))%>%
     dplyr::select("long","lat.x","id","time","number","corer","corer_m", "lon","lat.y","cluster")
-  print(corepoly)
+  #print(corepoly)
   
   #################
   ## for DMA insert
   
   clustersigs<-clusty%>%
     dplyr::select(PolyID,cluster,time,number,sightID)
-  print(clustersigs)
+  #print(clustersigs)
   trigsize<-clustersigs %>% 
     group_by(cluster)%>%
     summarise(TRIGGER_GROUPSIZE = sum(number), TRIGGERDATE = min(time))
-  print(trigsize)
+  #print(trigsize)
   #################
   
   ##gets to the core for the cluster
@@ -310,7 +311,7 @@ if (nrow(zonesig) > 0){
     group_by(cluster) %>%
     summarise(maxlat = max(lat.x), minlat = min(lat.x), maxlon = max(long), minlon = min(long))%>%
     as.data.frame()
-  print(polymaxmin)
+  #print(polymaxmin)
   
   ##corners
   corebounds_nw<-polymaxmin%>%
@@ -359,13 +360,12 @@ if (nrow(zonesig) > 0){
     dplyr::rename("Latitude" = "y", "Longitude" = "x")%>%
     mutate(ID = 1:n())%>%
     dplyr::select(ID,Latitude, Longitude)
-  print(cent_df)
+  #print(cent_df)
   values$cent_df<-cent_df
   output$centroidtable<-renderTable({cent_df},  striped = TRUE)
   
   egtrig<-egtrig%>%
     mutate(corer=round(sqrt(number/(pi*egden)),2))
-  
   
   #############
   ## mapping ##
