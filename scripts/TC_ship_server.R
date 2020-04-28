@@ -16,7 +16,7 @@ df <- reactive({
     x<-read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
     x$time<-mdy_hm(x$time)
     values$sigdate<-unique(date(x$time))
-    values$webshotpath<-paste0(getwd(),"/",values$sigdate,"_map")
+    values$webshotpath<-paste0(getwd(),"/map")
     
     read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
     }

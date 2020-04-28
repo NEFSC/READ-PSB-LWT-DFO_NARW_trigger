@@ -16,7 +16,7 @@ df <- reactive({
     x<-read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
     x$time<-mdy_hm(x$time)
     values$sigdate<-unique(date(x$time))
-    values$webshotpath<-paste0(getwd(),"/",values$sigdate,"_map")
+    values$webshotpath<-paste0(getwd(),"/map")
     values$trigmessage<-renderText({"If sightings fall outside of existing dynamic protection zones, the analysis will take a minute or two."})
     read.csv(inFile$datapath, header = TRUE, stringsAsFactors = FALSE)
     
