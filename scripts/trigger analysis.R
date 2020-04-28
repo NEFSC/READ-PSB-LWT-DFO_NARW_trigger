@@ -32,12 +32,14 @@ ATL_grid.crop<-st_crop(ATL_grid.sp, ymin = ymin, xmin = xmin, ymax = ymax, xmax 
 webshotpath<-paste0(getwd(),"/",sigdate,"_map")
 print(webshotpath)
 
+print("start html")
 snap<-function(x,y){
   
   htmlwidgets::saveWidget(x, "temp.html", selfcontained = FALSE)
   webshot::webshot("temp.html", file = paste0(sigdate,"_map",y,".png"), vwidth = 600, vheight = 450)
   
 }
+print("end html")
 
 mapbase<-leaflet(data = egdaily, options = leafletOptions(zoomControl = FALSE)) %>% 
   addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
@@ -486,6 +488,8 @@ output$trigmessage<-renderText({})
   output$map4<-renderLeaflet({})
   enable("mappdf")
   output$trigmessage<-renderText({})
+  
+  cent_df<-""
   
 } else {
   disable("mappdf")
