@@ -14,7 +14,7 @@
   
   ##Full Atlantic grid that we got from DFO via K. Davies Oct 2019
   ## read and transform this differently to crop it later (I have only been successful in package sf)
-  ATL_grid<-st_read(shapepath, layer = "Full_ATL_grids")
+  ATL_grid.sp<-st_read(shapepath, layer = "Full_ATL_grids")
   
   ##management measures
   ##dynamic fishing grid
@@ -34,7 +34,7 @@
   fath_20<-readOGR(shapepath, layer = "fath_20")
 
 ## projected properly
-ATL_grid.tr<-st_transform(ATL_grid, CRS.new)
+#ATL_grid.tr<-st_transform(ATL_grid, CRS.new)
 
 dynafish.tr<-spTransform(dynafish, CRS.new)
 dynaship.tr<-spTransform(dynaship, CRS.new)
@@ -46,7 +46,7 @@ fath_10.tr<-spTransform(fath_10, CRS.new)
 fath_20.tr<-spTransform(fath_20, CRS.new)
 
 ######  
-ATL_grid.sp<-st_transform(ATL_grid.tr,CRS.latlon)
+#ATL_grid.sp<-st_transform(ATL_grid.tr,CRS.latlon)
 
 dynafish.sp<-spTransform(dynafish.tr,CRS.latlon)
 dynaship.sp<-spTransform(dynaship.tr,CRS.latlon)
