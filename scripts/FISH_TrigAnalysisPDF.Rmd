@@ -18,10 +18,13 @@ if (exists("map2")){
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis', out.width = '45%', fig.align="center", fig.show='hold'}
 if (exists("map3")){
-knitr::include_graphics(c(paste0(params$webshotpath,"3.png"),paste0(params$webshotpath,"4.png")))}
+  knitr::include_graphics(c(paste0(params$webshotpath,"3.png"),paste0(params$webshotpath,"4.png")))
+}
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis'}
-knitr::kable(params$cent_df, caption = "Centroid coordinates")
+if(exists("cent_df")){
+  knitr::kable(params$cent_df, caption = "Centroid coordinates")
+}
 ```
 ```{r echo = FALSE, warning = FALSE, results = 'asis', out.width = '45%', fig.align="center", fig.show='hold'}
 knitr::include_graphics(paste0(getwd(),"/mapbase.png"))
