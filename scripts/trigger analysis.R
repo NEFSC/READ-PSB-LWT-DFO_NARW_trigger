@@ -42,54 +42,15 @@ snap<-function(x,y){
 }
 print("end html")
 
-mapbase<-leaflet(data = egdaily, options = leafletOptions(zoomControl = FALSE)) %>% 
-  addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
-  addPolygons(data = spm.sp, weight = 2, color = "white") %>%
-  addPolygons(data = dynafish.sp, weight = 2, color = "black") %>%
-  addPolygons(data = dynaship.sp, weight = 3, color = "green", opacity = 0.8) %>%
-  addPolylines(data = shipzone.sp, weight = 2, color = "red")%>%
-  addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
-  addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
-  addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")
-
-###################################
-## Evaluating Over Dynamic Zones ##
-###################################
-
 ##evaluate sightings if in st. pierre et micquelon
 #SPM<-!is.na(sp::over(eg.tr, as(spm, "SpatialPolygons")))
-
-############
-if(FS == 'FISH'){
-  ##evaluate sightings over the dynamic fishing grid
-  dynfish<-!is.na(sp::over(eg.tr, as(dynafish.tr, "SpatialPolygons")))
-  ##filter for eg sightings that fall outside of BOF and GSL for dynamic fishing closures
-  egtrig<-egdaily%>%
-    mutate(dyneval = dynfish)%>%
-    filter(dyneval == FALSE)
-  ##filter for eg sightings that fall inside of BOF or GSL
-  eg1trig<-egdaily%>%
-    mutate(dyneval = dynfish)%>%
-    filter(dyneval == TRUE)
-} else if (FS == 'SHIP'){
-  ##evaluate sightings over the dynamic shipping grid
-  dynship<-!is.na(sp::over(eg.tr, as(dynaship.tr, "SpatialPolygons")))
-  ##filter for eg sightings that should be evaluated for dynamic shipping speed zones
-  egtrig<-egdaily%>%
-    mutate(dyneval = dynship)%>%
-    filter(dyneval == FALSE)
-  #filter for when one eg sighting triggers something (in shipping lanes)
-  eg1trig<-egdaily%>%
-    mutate(dyneval = dynship)%>%
-    filter(dyneval == TRUE)
-    
-}
-############
 ##consider adding something here that asks if sightings are in France (SPM)
 
 ######################
 ## trigger analysis ##
 ######################
+
+egtrig<-egdaily
 
 #spatial analysis
 ## 1 nautical mile is 1852 meters
@@ -97,11 +58,9 @@ m_nm<-1/1852
 ## eg density is 4 whales/100nm^2 (50 CFR Part 224)
 egden<-0.0416
 
-#########################################
-## animals potential for zone triggers ##
-#########################################
-
-if (FALSE %in% egtrig$dyneval) {
+#######################################
+## animals potential for aggregation ##
+#######################################
 
   ##only taking ACTION_NEW = na
   actionna<-egtrig %>% dplyr::select("time", "lat", "lon", "number","sightID")
@@ -388,14 +347,23 @@ if (nrow(zonesig) > 0){
     maxlat<-max(egtrig$lat)
   }
   
-  
-  mapbase<-mapbase%>%
+  mapbase<-leaflet(data = egdaily, options = leafletOptions(zoomControl = FALSE)) %>% 
+    addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
+    addPolygons(data = spm.sp, weight = 2, color = "white") %>%
+    addPolylines(data = fath_10.sp, weight = 2, color = "orange")%>%
+    addPolylines(data = fath_20.sp, weight = 2, color = "brown")%>%
+    addPolygons(data = crit_habi.sp, weight = 2, color = "yellow")%>%
     fitBounds(minlon,minlat,maxlon,maxlat)
   
   if (FS == 'FISH'){
-  mapbase<-mapbase%>%
+  
+    addPolygons(data = dynafish.sp, weight = 2, color = "black", fill = F) %>%
     addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))
-  } 
+  } else {
+    mapbase<-mapbase%>%
+      addPolygons(data = dynaship.sp, weight = 3, color = "green", opacity = 0.8) %>%
+      addPolylines(data = shipzone.sp, weight = 2, color = "red")
+  }
   
  map1<-mapbase%>%
    addCircleMarkers(lng = ~egtrig$lon, lat = ~egtrig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(egtrig$number), popup = paste0(egtrig$time,", Group Size:", egtrig$number))%>%
@@ -436,24 +404,7 @@ enable("mappdf")
 output$trigmessage<-renderText({})
 }
   
-} else if (TRUE %in% eg1trig$dyneval){
-  
-  if(max(eg1trig$lon)-min(eg1trig$lon) < 0.2 | max(eg1trig$lat)-min(eg1trig$lat) < 0.2){
-    minlon<-min(eg1trig$lon)+0.1
-    minlat<-min(eg1trig$lat)-0.1
-    maxlon<-max(eg1trig$lon)-0.1
-    maxlat<-max(eg1trig$lat)+0.1
-  } else {
-    minlon<-min(eg1trig$lon)
-    minlat<-min(eg1trig$lat)
-    maxlon<-max(eg1trig$lon)
-    maxlat<-max(eg1trig$lat)
-  }
-  
-  print("trig1")
-  leafpal <- colorFactor(palette = rev("RdPu"), 
-                         domain = eg1trig$number)
-  
+
   #########################
   #this section was used to make mapbase for the pdf output, but it does not need to be run every time. Only if shapes change. Go to line 409.
   #need to also uncomment the snap for mapb below 
@@ -468,34 +419,3 @@ output$trigmessage<-renderText({})
   # print("mapb")
   ########################
   
-  if (FS == 'FISH'){
-    mapbase<-mapbase%>%
-      addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))
-  } 
-  
-  map1<-mapbase %>% 
-    addEsriBasemapLayer(esriBasemapLayers$Oceans, autoLabels=FALSE) %>%
-    addCircleMarkers(lng = ~eg1trig$lon, lat = ~eg1trig$lat, radius = 5, fillOpacity = 1, weight = 2, color = "black", fillColor = ~leafpal(eg1trig$number), popup = paste0(eg1trig$time,", Group Size:", eg1trig$number))%>%
-    addLegend(pal = leafpal, values = eg1trig$number, opacity = 0.9, position = "topleft", title = "# NARW / BNAN")%>%
-    fitBounds(minlon,minlat,maxlon,maxlat)
-  
-  snap(map1,1)
-  print("map 1") 
-
-  output$map1<-renderLeaflet({map1})
-  output$map2<-renderLeaflet({})
-  output$map3<-renderLeaflet({})
-  output$map4<-renderLeaflet({})
-  enable("mappdf")
-  output$trigmessage<-renderText({})
-  
-} else {
-  disable("mappdf")
-  output$map1<-renderLeaflet({})
-  output$map2<-renderLeaflet({})
-  output$map3<-renderLeaflet({})
-  output$map4<-renderLeaflet({})
-  output$trigmessage<-renderText({"All right whale sightings fall within dynamic zones and do not trigger additional protections."})
-}
-
-
