@@ -399,14 +399,14 @@ print("map 3")
 snap(map4,4) 
 print("map 4")
 
-incProgress(1/5) #for progress bar
-
 output$map1<-renderLeaflet({map1})
 output$map2<-renderLeaflet({map2})
 output$map3<-renderLeaflet({map3})
 output$map4<-renderLeaflet({map4})
 enable("mappdf")
 output$trigmessage<-renderText({})
+
+incProgress(1/5) #for progress bar
 }
   
 
