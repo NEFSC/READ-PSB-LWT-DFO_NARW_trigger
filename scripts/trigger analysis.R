@@ -362,7 +362,12 @@ if (nrow(zonesig) > 0){
   } else {
     mapbase<-mapbase%>%
       addPolygons(data = dynaship.sp, weight = 3, color = "green", opacity = 0.8) %>%
-      addPolylines(data = shipzone.sp, weight = 2, color = "red")
+      addPolylines(data = shipzone.sp, weight = 2, color = "red")%>%
+      addWMSTiles(
+        "https://gis.ngdc.noaa.gov/arcgis/services/graticule/MapServer/WMSServer/",
+        layers = c("1-degree grid", "5-degree grid"),
+        options = WMSTileOptions(format = "image/png8", transparent = TRUE),
+        attribution = NULL)
   }
   
  map1<-mapbase%>%
