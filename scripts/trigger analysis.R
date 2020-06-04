@@ -83,7 +83,7 @@ egden<-0.0416
   #print("dmacand")
   #print(dmacand)
   if (nrow(dmacand) == 0){
-    output$trigmessage<-renderText({"Sightings do not trigger a closure"})
+    output$trigmessage<-renderText({"Sightings do not trigger the aggregation criteria"})
   }
   ##filters for all distinct sightings that should be considered for DMA calculation
   dmasightID<-data.frame(sightID = c(dmacand$sightID,dmacand$sightID2)) %>%
