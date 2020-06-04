@@ -356,9 +356,9 @@ if (nrow(zonesig) > 0){
     fitBounds(minlon,minlat,maxlon,maxlat)
   
   if (FS == 'FISH'){
-  
-    addPolygons(data = dynafish.sp, weight = 2, color = "black", fill = F) %>%
-    addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))
+    mapbase<-mapbase%>%
+      addPolygons(data = dynafish.sp, weight = 2, color = "black", fill = F) %>%
+      addPolygons(data = ATL_grid.crop, weight = 2, color = "grey", fill = F, opacity = 0.2, label = ATL_grid.crop$Grid_Index, labelOptions = labelOptions(noHide = T, textOnly = TRUE, direction = "center"))
   } else {
     mapbase<-mapbase%>%
       addPolygons(data = dynaship.sp, weight = 3, color = "green", opacity = 0.8) %>%
