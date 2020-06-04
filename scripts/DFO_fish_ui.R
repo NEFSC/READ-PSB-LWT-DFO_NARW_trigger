@@ -25,7 +25,7 @@ fluidPage(
                   ))),
       br(),#space
       br(),#space
-      textOutput("trigmessage"),
+      h3(textOutput("trigmessage"), style="color:red"),
       br(),
       splitLayout(leafletOutput("map1"),leafletOutput("map2"),
       width = 2),
