@@ -63,25 +63,30 @@ egden<-0.0416
 #######################################
 
   ##only taking ACTION_NEW = na
-  actionna<-egtrig %>% dplyr::select("time", "lat", "lon", "number","sightID")
+  actionna<-egtrig%>%
+    ##calculates whale density radius
+            mutate(corer = round(sqrt(number/(pi*egden)),2))%>%
+            dplyr::select("time", "lat", "lon", "number","sightID","corer")
   ##distance between points matrix -- compares right whale sightings positions to each other
   combo<-reshape::expand.grid.df(actionna,actionna)
-  names(combo)[6:10]<-c("time2","lat2","lon2","number2","sightID2")
-  str(combo)
-  ##calculates core area
-  setDT(combo)[ ,corer:=round(sqrt(number/(pi*egden)),2)] 
-  ##calculates distance between points in nautical miles
-  setDT(combo)[ ,dist_nm:=geosphere::distVincentyEllipsoid(matrix(c(lon,lat), ncol = 2),
-                                                           matrix(c(lon2, lat2), ncol =2), 
-                                                           a=6378137, f=1/298.257222101)*m_nm]
+  names(combo)[7:12]<-c("time2","lat2","lon2","number2","sightID2","corer2")
+  ##str(combo)
+  
+  ##calculates distance between points in nautical miles and the radii distance between points for trigger
+  combo <- combo%>%
+    mutate(dist_nm=geosphere::distVincentyEllipsoid(matrix(c(lon,lat), ncol = 2),
+                                                    matrix(c(lon2, lat2), ncol =2), 
+                                                    a=6378137, f=1/298.257222101)*m_nm,
+           total_corer = corer + corer2)
   #print(combo)
   #filters out points compared where core radius is less than the distance between them and
   #keeps the single sightings where group size alone would be enough to trigger a DMA (0 nm dist means it is compared to itself)
   #I don't remember why I named this dmacand -- maybe dma combo and... then some?
   dmacand<-combo %>%
-    dplyr::filter((combo$dist_nm != 0 & combo$dist_nm <= combo$corer) | (combo$number > 2 & combo$dist_nm == 0))
-  #print("dmacand")
-  #print(dmacand)
+    dplyr::filter((dist_nm != 0 & dist_nm <= total_corer) | (number > 2 & dist_nm == 0))
+  print("dmacand")
+  print(dmacand)
+  
   if (nrow(dmacand) == 0){
     output$trigmessage<-renderText({"Sightings do not trigger the aggregation criteria"})
   }
