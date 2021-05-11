@@ -9,7 +9,7 @@ df <- reactive({
   # be found.
   
   inFile <- input$egcanada
-
+  print(inFile)
   if (is.null(inFile)){
     return("")
   }else{
